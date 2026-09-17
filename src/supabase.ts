@@ -36,14 +36,20 @@ export async function loadData(): Promise<SiteData> {
 
   if (error) throw error;
 
-  // PERBAIKAN: Jika data tidak ditemukan, JANGAN auto-save default ke database.
-  // Cukup kembalikan data default ke UI. Ini mencegah data ter-reset saat HP
-  // gagal fetch (misal sinyal lemah atau RLS memblokir akses anon).
+  // Kalau data tidak ada di DB, return default (jangan save)
   if (!data) {
     return JSON.parse(JSON.stringify(DEFAULT_DATA));
   }
 
-  return data.content as SiteData;
+  const content = data.content as SiteData | null;
+
+  // PERBAIKAN: Kalau content kosong / tidak punya hero, pakai default
+  // Ini mencegah bug saat DB berisi {} (object kosong)
+  if (!content || !content.hero) {
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+
+  return content;
 }
 
 export async function saveData(content: SiteData): Promise<void> {
