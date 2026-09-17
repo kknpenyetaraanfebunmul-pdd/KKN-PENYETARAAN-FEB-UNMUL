@@ -129,7 +129,6 @@ export function AdminDashboard({
 
   return (
     <div className="fixed inset-0 z-[10002] bg-[#f0ecf7] flex flex-col">
-      {/* HEADER */}
       <div className="bg-gradient-to-r from-[#2b1c3d] to-[#7b5ea7] text-white px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
         <div className="flex items-center gap-3">
           <div className="text-lg sm:text-2xl font-extrabold tracking-widest">KKN. Admin</div>
@@ -147,9 +146,7 @@ export function AdminDashboard({
         </div>
       </div>
 
-      {/* BODY */}
       <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
-        {/* SIDEBAR */}
         <div className="sm:w-56 bg-white border-b sm:border-b-0 sm:border-r border-[#7b5ea7]/10 overflow-x-auto sm:overflow-y-auto no-scrollbar flex sm:flex-col p-2 sm:p-3 gap-1">
           {tabs.map((t) => (
             <button
@@ -167,7 +164,6 @@ export function AdminDashboard({
           ))}
         </div>
 
-        {/* CONTENT */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           {tab === 'hero' && <HeroPanel data={data} update={update} showToast={showToast} />}
           {tab === 'struktur' && <StrukturPanel data={data} update={update} showToast={showToast} />}
@@ -180,7 +176,6 @@ export function AdminDashboard({
         </div>
       </div>
 
-      {/* TOAST */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white text-sm font-bold shadow-2xl animate-toast z-[10010]">
           ✓ {toast}
