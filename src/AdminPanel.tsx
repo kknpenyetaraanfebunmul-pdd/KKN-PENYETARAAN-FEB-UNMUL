@@ -94,26 +94,35 @@ export function AdminDashboard({
   open,
   onClose,
   data,
-  setData,
+  updateData,
   onReset,
 }: {
   open: boolean;
   onClose: () => void;
   data: SiteData;
-  setData: (d: SiteData) => void;
+  updateData: (p: Partial<SiteData>) => Promise<boolean>;
   onReset: () => void;
 }) {
   const [tab, setTab] = useState<Tab>('hero');
   const [toast, setToast] = useState('');
+  const [toastError, setToastError] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const showToast = (msg: string) => {
+  const showToast = (msg: string, isError = false) => {
     setToast(msg);
+    setToastError(isError);
     setTimeout(() => setToast(''), 2200);
   };
 
-  const update = (partial: Partial<SiteData>) => {
-    const next = { ...data, ...partial };
-    setData(next);
+  // Fungsi update sekarang async — panggil Supabase
+  const update = async (partial: Partial<SiteData>): Promise<boolean> => {
+    setIsSaving(true);
+    try {
+      const ok = await updateData(partial);
+      return ok;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!open) return null;
@@ -129,6 +138,7 @@ export function AdminDashboard({
 
   return (
     <div className="fixed inset-0 z-[10002] bg-[#f0ecf7] flex flex-col">
+      {/* HEADER */}
       <div className="bg-gradient-to-r from-[#2b1c3d] to-[#7b5ea7] text-white px-4 sm:px-8 py-4 flex items-center justify-between shadow-lg">
         <div className="flex items-center gap-3">
           <div className="text-lg sm:text-2xl font-extrabold tracking-widest">KKN. Admin</div>
@@ -136,7 +146,13 @@ export function AdminDashboard({
             Control Panel
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {isSaving && (
+            <div className="text-[10px] font-bold uppercase tracking-widest bg-white/15 px-3 py-2 rounded-xl flex items-center gap-2">
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Menyimpan...
+            </div>
+          )}
           <button
             onClick={onClose}
             className="px-3 sm:px-4 py-2 rounded-xl bg-white/15 border border-white/20 hover:bg-white/25 text-xs font-semibold flex items-center gap-1 transition"
@@ -146,7 +162,9 @@ export function AdminDashboard({
         </div>
       </div>
 
+      {/* BODY */}
       <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
+        {/* SIDEBAR */}
         <div className="sm:w-56 bg-white border-b sm:border-b-0 sm:border-r border-[#7b5ea7]/10 overflow-x-auto sm:overflow-y-auto no-scrollbar flex sm:flex-col p-2 sm:p-3 gap-1">
           {tabs.map((t) => (
             <button
@@ -164,6 +182,7 @@ export function AdminDashboard({
           ))}
         </div>
 
+        {/* CONTENT */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           {tab === 'hero' && <HeroPanel data={data} update={update} showToast={showToast} />}
           {tab === 'struktur' && <StrukturPanel data={data} update={update} showToast={showToast} />}
@@ -176,9 +195,16 @@ export function AdminDashboard({
         </div>
       </div>
 
+      {/* TOAST */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white text-sm font-bold shadow-2xl animate-toast z-[10010]">
-          ✓ {toast}
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-white text-sm font-bold shadow-2xl animate-toast z-[10010] ${
+            toastError
+              ? 'bg-gradient-to-br from-red-500 to-red-700'
+              : 'bg-gradient-to-br from-green-500 to-emerald-600'
+          }`}
+        >
+          {toastError ? '✗' : '✓'} {toast}
         </div>
       )}
     </div>
@@ -261,22 +287,26 @@ const AddBtn = ({ onClick, label }: { onClick: () => void; label: string }) => (
 
 /* ============== PANELS ============== */
 
+/* ========== HERO PANEL ========== */
 function HeroPanel({
   data,
   update,
   showToast,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
 }) {
   const [draft, setDraft] = useState(data.hero);
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const save = () => {
-    update({ hero: draft });
-    showToast('Hero berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ hero: draft });
+    setSaving(false);
+    showToast(ok ? 'Hero berhasil disimpan!' : 'Gagal menyimpan. Cek koneksi.', !ok);
   };
 
   const addBg = () => {
@@ -340,7 +370,7 @@ function HeroPanel({
     try {
       const base64 = await compressImage(file);
       updateBgUrl(i, base64);
-      showToast(`Foto ${i + 1} berhasil diupload!`);
+      showToast(`Foto ${i + 1} siap diupload. Klik Simpan Hero untuk menyimpan.`);
     } catch (err) {
       alert('Gagal upload gambar: ' + err);
     } finally {
@@ -497,26 +527,43 @@ function HeroPanel({
       </Card>
 
       <div className="flex gap-3">
-        <SaveBtn onClick={save} label="Simpan Hero" />
+        <button
+          onClick={save}
+          disabled={saving}
+          className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            <>
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Menyimpan...
+            </>
+          ) : (
+            <>💾 Simpan Hero</>
+          )}
+        </button>
       </div>
     </div>
   );
 }
 
+/* ========== STRUKTUR PANEL ========== */
 function StrukturPanel({
   data,
   update,
   showToast,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
 }) {
   const [draft, setDraft] = useState(data.struktur);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    update({ struktur: draft });
-    showToast('Struktur berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ struktur: draft });
+    setSaving(false);
+    showToast(ok ? 'Struktur berhasil disimpan!' : 'Gagal menyimpan.', !ok);
   };
 
   return (
@@ -556,25 +603,42 @@ function StrukturPanel({
           label="Tambah Struktur"
         />
       </div>
-      <SaveBtn onClick={save} label="Simpan Struktur" />
+      <button
+        onClick={save}
+        disabled={saving}
+        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {saving ? (
+          <>
+            <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Menyimpan...
+          </>
+        ) : (
+          <>💾 Simpan Struktur</>
+        )}
+      </button>
     </div>
   );
 }
 
+/* ========== PROGRAM PANEL ========== */
 function ProgramPanel({
   data,
   update,
   showToast,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
 }) {
   const [draft, setDraft] = useState(data.program);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    update({ program: draft });
-    showToast('Program berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ program: draft });
+    setSaving(false);
+    showToast(ok ? 'Program berhasil disimpan!' : 'Gagal menyimpan.', !ok);
   };
 
   return (
@@ -697,25 +761,42 @@ function ProgramPanel({
           label="Tambah Program"
         />
       </div>
-      <SaveBtn onClick={save} label="Simpan Program" />
+      <button
+        onClick={save}
+        disabled={saving}
+        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {saving ? (
+          <>
+            <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Menyimpan...
+          </>
+        ) : (
+          <>💾 Simpan Program</>
+        )}
+      </button>
     </div>
   );
 }
 
+/* ========== GALLERY PANEL ========== */
 function GalleryPanel({
   data,
   update,
   showToast,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
 }) {
   const [draft, setDraft] = useState(data.gallery);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    update({ gallery: draft });
-    showToast('Gallery berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ gallery: draft });
+    setSaving(false);
+    showToast(ok ? 'Gallery berhasil disimpan!' : 'Gagal menyimpan.', !ok);
   };
 
   return (
@@ -787,25 +868,42 @@ function GalleryPanel({
           label="Tambah Media"
         />
       </div>
-      <SaveBtn onClick={save} label="Simpan Gallery" />
+      <button
+        onClick={save}
+        disabled={saving}
+        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {saving ? (
+          <>
+            <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Menyimpan...
+          </>
+        ) : (
+          <>💾 Simpan Gallery</>
+        )}
+      </button>
     </div>
   );
 }
 
+/* ========== CONTACT PANEL ========== */
 function ContactPanel({
   data,
   update,
   showToast,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
 }) {
   const [draft, setDraft] = useState(data.contact);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    update({ contact: draft });
-    showToast('Contact berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ contact: draft });
+    setSaving(false);
+    showToast(ok ? 'Contact berhasil disimpan!' : 'Gagal menyimpan.', !ok);
   };
 
   return (
@@ -841,11 +939,25 @@ function ContactPanel({
         <Input label="Email" value={draft.email} onChange={(v) => setDraft({ ...draft, email: v })} />
       </Card>
 
-      <SaveBtn onClick={save} label="Simpan Contact" />
+      <button
+        onClick={save}
+        disabled={saving}
+        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+      >
+        {saving ? (
+          <>
+            <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Menyimpan...
+          </>
+        ) : (
+          <>💾 Simpan Contact</>
+        )}
+      </button>
     </div>
   );
 }
 
+/* ========== PARTNERS PANEL ========== */
 function PartnersPanel({
   data,
   update,
@@ -853,15 +965,18 @@ function PartnersPanel({
   onReset,
 }: {
   data: SiteData;
-  update: (p: Partial<SiteData>) => void;
-  showToast: (m: string) => void;
+  update: (p: Partial<SiteData>) => Promise<boolean>;
+  showToast: (m: string, err?: boolean) => void;
   onReset: () => void;
 }) {
   const [draft, setDraft] = useState(data.partners);
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    update({ partners: draft });
-    showToast('Partners berhasil disimpan!');
+  const save = async () => {
+    setSaving(true);
+    const ok = await update({ partners: draft });
+    setSaving(false);
+    showToast(ok ? 'Partners berhasil disimpan!' : 'Gagal menyimpan.', !ok);
   };
 
   return (
@@ -946,7 +1061,20 @@ function PartnersPanel({
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <SaveBtn onClick={save} label="Simpan Partners" />
+        <button
+          onClick={save}
+          disabled={saving}
+          className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold uppercase tracking-widest hover:shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            <>
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Menyimpan...
+            </>
+          ) : (
+            <>💾 Simpan Partners</>
+          )}
+        </button>
         <button
           onClick={() => {
             if (confirm('Yakin reset semua data ke default? Data yang tersimpan akan hilang.')) {
