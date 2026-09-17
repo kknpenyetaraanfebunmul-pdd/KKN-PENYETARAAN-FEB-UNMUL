@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { SiteData } from './types';
 import { DEFAULT_DATA } from './data';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl = 'https://pncpkgnehujdlomvgnfs.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBuY3BrZ25laHVqZGxvbXZnbmZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NDMxNTAsImV4cCI6MjEwNTIxOTE1MH0._AUAJkR_aHB2fW7jyCG9K__5WmylcdKte8CIZ8ZIS9Y';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   realtime: { params: { eventsPerSecond: 2 } },
