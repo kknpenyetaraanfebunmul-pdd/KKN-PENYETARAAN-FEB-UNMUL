@@ -121,7 +121,7 @@ export default function AdminPanel({ data, onSave, onReset }: AdminPanelProps) {
     setSaving(true);
     try {
       await onSave(draft);
-      showToast('Berhasil disimpan!');
+      showToast('Semua data berhasil disimpan!');
     } catch {
       showToast('Gagal menyimpan', 'error');
     } finally {
@@ -208,6 +208,18 @@ export default function AdminPanel({ data, onSave, onReset }: AdminPanelProps) {
           <div className="text-sm font-semibold text-gray-400 uppercase tracking-wide hidden sm:block">Control Panel</div>
         </div>
         <div className="flex gap-2.5">
+          {/* SAVE ALL BUTTON */}
+          <button 
+            onClick={handleSave} 
+            disabled={saving}
+            className="px-5 py-2 rounded-xl bg-gradient-to-br from-[#7b5ea7] to-[#2b1c3d] text-white text-xs font-bold shadow-md hover:-translate-y-0.5 hover:shadow-lg transition flex items-center gap-1.5 disabled:opacity-60"
+          >
+            {saving ? (
+              <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> <span className="hidden sm:inline">Menyimpan...</span></>
+            ) : (
+              <>{'\u{1F4BE}'} Save All</>
+            )}
+          </button>
           <button onClick={() => setDraft(JSON.parse(JSON.stringify(data)))} className="px-4 py-2 rounded-xl bg-[#ece6f5] text-[#2b1c3d] text-xs font-semibold hover:bg-[#ded0f0] transition flex items-center gap-1.5">
             {'\u{1F504}'} <span className="hidden sm:inline">Reload</span>
           </button>
