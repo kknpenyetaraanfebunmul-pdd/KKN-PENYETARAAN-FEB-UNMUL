@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
+* { font-family: 'Poppins', sans-serif; }
+
+html { scroll-behavior: smooth; }
+body { background-color: #f7f5fb; overflow-x: hidden; }
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Hero slideshow */
+@keyframes slideCarousel {
+  0%   { transform: translateX(100%); opacity: 0; }
+  8%   { transform: translateX(0);    opacity: 1; }
+  33%  { transform: translateX(0);    opacity: 1; }
+  41%  { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(-100%); opacity: 0; }
+}
+
+.slide-anim {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: slideCarousel 15s infinite;
+  will-change: transform, opacity;
+}
+
+/* Heartbeat */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+.animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+
+/* Shake for wrong passcode */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-8px); }
+  75%      { transform: translateX(8px); }
+}
+.animate-shake { animation: shake 0.4s; }
+
+/* Toast slide in */
+@keyframes toastIn {
+  from { transform: translateX(-50%) translateY(120%); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}
+.animate-toast { animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
