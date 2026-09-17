@@ -3,7 +3,6 @@ import type { SiteData, ProgramItem } from './types';
 import { DEFAULT_DATA, STORAGE_KEY } from './data';
 import { AdminLogin, AdminDashboard } from './AdminPanel';
 
-/* ========== HELPERS ========== */
 const loadData = (): SiteData => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -23,29 +22,24 @@ function App() {
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<number | null>(null);
 
-  /* Persist to localStorage */
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {}
   }, [data]);
 
-  /* Body scroll lock when modal open */
   useEffect(() => {
-    const locked = showLogin || showAdmin || programModal || lightboxIndex !== null;
+    const locked = showLogin || showAdmin || programModal !== null || lightboxIndex !== null;
     document.body.style.overflow = locked ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
   }, [showLogin, showAdmin, programModal, lightboxIndex]);
 
-  /* Dock nav show/hide */
   useEffect(() => {
     const onScroll = () => {
       const hero = document.getElementById('home');
-      const dock = document.getElementById('dockNav');
-      if (!hero || !dock) return;
-
+      if (!hero) return;
       const isMobile = window.innerWidth <= 900;
       if (isMobile) {
         setDockShow(true);
@@ -53,8 +47,6 @@ function App() {
         const rect = hero.getBoundingClientRect();
         setDockShow(rect.bottom < 50);
       }
-
-      // Scroll spy
       const scrollY = window.scrollY + window.innerHeight / 3;
       ['home', 'struktur', 'program', 'gallery', 'contact'].forEach((id) => {
         const el = document.getElementById(id);
@@ -65,7 +57,6 @@ function App() {
         }
       });
     };
-
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
@@ -75,14 +66,12 @@ function App() {
     };
   }, []);
 
-  /* 8-click trigger on copyright */
   const handleCopyrightClick = () => {
     clickCountRef.current += 1;
     if (clickTimerRef.current) window.clearTimeout(clickTimerRef.current);
     clickTimerRef.current = window.setTimeout(() => {
       clickCountRef.current = 0;
     }, 1500);
-
     if (clickCountRef.current >= 8) {
       clickCountRef.current = 0;
       setShowLogin(true);
@@ -97,13 +86,11 @@ function App() {
     }
   };
 
-  /* Hero slideshow items */
   const heroBgs = data.hero.backgroundImages.length > 0 ? data.hero.backgroundImages : [''];
 
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-        {/* HEADER */}
         <header className="py-4 sm:py-5 flex items-center justify-between gap-4">
           <div className="text-2xl sm:text-3xl font-extrabold tracking-widest bg-gradient-to-br from-[#2b1c3d] to-[#7b5ea7] bg-clip-text text-transparent">
             KKN.
@@ -116,7 +103,9 @@ function App() {
                   key={item}
                   onClick={() => scrollTo(id)}
                   className={`relative px-4 py-2 text-xs font-semibold uppercase tracking-wide transition rounded-full ${
-                    activeSection === id ? 'text-[#7b5ea7] bg-[#ece6f5]' : 'text-[#2b1c3d] hover:text-[#7b5ea7]'
+                    activeSection === id
+                      ? 'text-[#7b5ea7] bg-[#ece6f5]'
+                      : 'text-[#2b1c3d] hover:text-[#7b5ea7]'
                   }`}
                 >
                   {item}
@@ -126,7 +115,6 @@ function App() {
           </nav>
         </header>
 
-        {/* HERO */}
         <section
           id="home"
           className="relative flex items-center justify-center min-h-[500px] sm:min-h-[600px] rounded-3xl overflow-hidden mt-2"
@@ -164,7 +152,6 @@ function App() {
           </div>
         </section>
 
-        {/* STRUKTUR */}
         <section
           id="struktur"
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 bg-white rounded-3xl p-6 sm:p-10 mt-[-40px] relative z-10 shadow-lg"
@@ -181,8 +168,10 @@ function App() {
           ))}
         </section>
 
-        {/* PROGRAM */}
-        <h2 id="program" className="text-center text-sm font-extrabold uppercase tracking-[3px] text-[#2b1c3d] mt-16 mb-6">
+        <h2
+          id="program"
+          className="text-center text-sm font-extrabold uppercase tracking-[3px] text-[#2b1c3d] mt-16 mb-6"
+        >
           Program Kerja
         </h2>
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -204,8 +193,10 @@ function App() {
           ))}
         </section>
 
-        {/* GALLERY */}
-        <h2 id="gallery" className="text-center text-sm font-extrabold uppercase tracking-[3px] text-[#2b1c3d] mt-16 mb-6">
+        <h2
+          id="gallery"
+          className="text-center text-sm font-extrabold uppercase tracking-[3px] text-[#2b1c3d] mt-16 mb-6"
+        >
           Gallery
         </h2>
         <section className="relative">
@@ -226,7 +217,11 @@ function App() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <img src={g.src} alt={g.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img
+                    src={g.src}
+                    alt={g.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 )}
                 {g.type === 'video' && (
                   <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#2b1c3d]/85 text-white text-[9px] font-bold tracking-wider backdrop-blur-sm">
@@ -234,7 +229,9 @@ function App() {
                   </span>
                 )}
                 <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-[#2b1c3d]/85 to-transparent text-white text-left">
-                  <div className="text-xs font-bold uppercase tracking-wide leading-tight">{g.title}</div>
+                  <div className="text-xs font-bold uppercase tracking-wide leading-tight">
+                    {g.title}
+                  </div>
                   <div className="text-[10px] opacity-85 leading-tight mt-0.5">{g.desc}</div>
                 </div>
               </button>
@@ -242,7 +239,6 @@ function App() {
           </div>
         </section>
 
-        {/* CONTACT */}
         <section
           id="contact"
           className="mt-16 mb-[120px] md:mb-16 rounded-[24px] sm:rounded-[40px] bg-gradient-to-br from-[#ece6f5] via-[#ded0f0] to-[#ece6f5] p-8 sm:p-14 text-center relative overflow-hidden"
@@ -256,7 +252,8 @@ function App() {
               <span className="text-[#7b5ea7]">Ayo Bicara!</span>
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto mb-10">
-              Kami terbuka untuk kolaborasi, pertanyaan, atau sekadar berbagi cerita seputar KKN Penyetaraan.
+              Kami terbuka untuk kolaborasi, pertanyaan, atau sekadar berbagi cerita seputar KKN
+              Penyetaraan.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
@@ -272,8 +269,12 @@ function App() {
                   </svg>
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">Instagram</div>
-                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">{data.contact.instagram}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">
+                    Instagram
+                  </div>
+                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">
+                    {data.contact.instagram}
+                  </div>
                 </div>
                 <div className="text-[#7b5ea7] opacity-50">→</div>
               </a>
@@ -290,8 +291,12 @@ function App() {
                   </svg>
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">TikTok</div>
-                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">{data.contact.tiktok}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">
+                    TikTok
+                  </div>
+                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">
+                    {data.contact.tiktok}
+                  </div>
                 </div>
                 <div className="text-[#7b5ea7] opacity-50">→</div>
               </a>
@@ -306,14 +311,17 @@ function App() {
                   </svg>
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">Email</div>
-                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">{data.contact.email}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#7b5ea7]">
+                    Email
+                  </div>
+                  <div className="text-xs font-extrabold text-[#2b1c3d] truncate">
+                    {data.contact.email}
+                  </div>
                 </div>
                 <div className="text-[#7b5ea7] opacity-50">→</div>
               </a>
             </div>
 
-            {/* PARTNERS */}
             <div className="mt-14 bg-white rounded-3xl p-8 sm:p-12 shadow-md">
               <div className="mb-8">
                 <div className="text-center text-xs font-extrabold uppercase tracking-[3px] text-[#7b5ea7] mb-6">
@@ -350,12 +358,8 @@ function App() {
               </div>
             </div>
 
-            {/* FOOTER */}
             <div className="mt-10 pt-6 border-t border-[#7b5ea7]/15 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-500">
-              <div
-                onClick={handleCopyrightClick}
-                className="select-none cursor-default"
-              >
+              <div onClick={handleCopyrightClick} className="select-none cursor-default">
                 © 2025 <strong className="text-[#7b5ea7]">KKN Penyetaraan</strong>. All rights reserved.
               </div>
               <div className="flex items-center gap-1.5">
@@ -366,17 +370,12 @@ function App() {
         </section>
       </div>
 
-      {/* ============ FLOATING DOCK NAV ============ */}
       <nav
         className={`fixed z-[999] flex gap-1 p-2.5 bg-white/75 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl transition-all duration-500 ${
           dockShow ? 'opacity-100 visible' : 'opacity-0 invisible'
-        } ${
-          'md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col md:p-3 md:rounded-[28px] md:translate-x-0'
-        } ${
+        } md:right-5 md:top-1/2 md:-translate-y-1/2 md:flex-col md:p-3 md:rounded-[28px] ${
           dockShow ? 'md:translate-x-0' : 'md:translate-x-[120%]'
-        } ${
-          'max-md:bottom-4 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row max-md:max-w-[calc(100vw-32px)] max-md:overflow-x-auto no-scrollbar'
-        }`}
+        } max-md:bottom-4 max-md:left-1/2 max-md:-translate-x-1/2 max-md:flex-row max-md:max-w-[calc(100vw-32px)] max-md:overflow-x-auto no-scrollbar`}
       >
         {[
           { id: 'home', icon: '🏠', label: 'Home' },
@@ -395,12 +394,13 @@ function App() {
             }`}
           >
             <span className="text-lg">{item.icon}</span>
-            <span className="text-[8px] font-bold uppercase tracking-wider opacity-80">{item.label}</span>
+            <span className="text-[8px] font-bold uppercase tracking-wider opacity-80">
+              {item.label}
+            </span>
           </button>
         ))}
       </nav>
 
-      {/* ============ PROGRAM MODAL ============ */}
       {programModal && (
         <div
           className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-[#140c1e]/70 backdrop-blur-md"
@@ -420,7 +420,7 @@ function App() {
             <div className="relative p-8 sm:p-10 bg-gradient-to-br from-[#ece6f5] to-[#ded0f0] rounded-t-3xl overflow-hidden">
               <div className="absolute -top-16 -right-16 w-52 h-52 rounded-full bg-[#7b5ea7]/15" />
               <div className="relative">
-                <div className="w-18 h-18 w-[72px] h-[72px] bg-white rounded-full flex items-center justify-center text-4xl mb-5 shadow-lg">
+                <div className="w-[72px] h-[72px] bg-white rounded-full flex items-center justify-center text-4xl mb-5 shadow-lg">
                   {programModal.icon}
                 </div>
                 <div className="text-[11px] font-bold uppercase tracking-[2px] text-[#7b5ea7] mb-1.5">
@@ -429,7 +429,9 @@ function App() {
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-[#2b1c3d] uppercase tracking-tight mb-2">
                   {programModal.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium">{programModal.subtitle}</p>
+                <p className="text-xs sm:text-sm text-gray-600 font-medium">
+                  {programModal.subtitle}
+                </p>
               </div>
             </div>
 
@@ -439,7 +441,9 @@ function App() {
                   Deskripsi Program
                   <span className="flex-1 h-px bg-gradient-to-r from-[#7b5ea7]/20 to-transparent" />
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">{programModal.description}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {programModal.description}
+                </p>
               </div>
 
               {programModal.activities.length > 0 && (
@@ -450,11 +454,16 @@ function App() {
                   </div>
                   <div className="space-y-2.5">
                     {programModal.activities.map((a, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#ece6f5] hover:bg-[#e3d9f2] hover:translate-x-1 transition">
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 p-3 rounded-xl bg-[#ece6f5] hover:bg-[#e3d9f2] hover:translate-x-1 transition"
+                      >
                         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center text-[11px] font-bold text-[#7b5ea7]">
                           {i + 1}
                         </div>
-                        <div className="text-xs text-[#2b1c3d] font-medium leading-relaxed">{a}</div>
+                        <div className="text-xs text-[#2b1c3d] font-medium leading-relaxed">
+                          {a}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -484,7 +493,6 @@ function App() {
         </div>
       )}
 
-      {/* ============ LIGHTBOX ============ */}
       {lightboxIndex !== null && data.gallery[lightboxIndex] && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-10 bg-[#140c1e]/92 backdrop-blur-md"
@@ -502,7 +510,9 @@ function App() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setLightboxIndex((lightboxIndex - 1 + data.gallery.length) % data.gallery.length);
+                  setLightboxIndex(
+                    (lightboxIndex - 1 + data.gallery.length) % data.gallery.length
+                  );
                 }}
                 className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 border border-white/15 text-white flex items-center justify-center text-2xl hover:bg-white/20 transition"
               >
@@ -520,7 +530,10 @@ function App() {
             </>
           )}
 
-          <div className="max-w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="max-w-full max-h-full flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="max-w-[min(1100px,92vw)] max-h-[80vh] rounded-2xl overflow-hidden shadow-2xl bg-black">
               {data.gallery[lightboxIndex].type === 'video' ? (
                 <video
@@ -548,7 +561,6 @@ function App() {
         </div>
       )}
 
-      {/* ============ ADMIN LOGIN ============ */}
       <AdminLogin
         open={showLogin}
         onClose={() => setShowLogin(false)}
@@ -558,7 +570,6 @@ function App() {
         }}
       />
 
-      {/* ============ ADMIN DASHBOARD ============ */}
       <AdminDashboard
         open={showAdmin}
         onClose={() => setShowAdmin(false)}

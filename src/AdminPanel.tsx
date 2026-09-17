@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { SiteData } from './types';
 import { DEFAULT_DATA, ADMIN_PASSCODE } from './data';
 
@@ -190,7 +190,7 @@ export function AdminDashboard({
   );
 }
 
-/* Reusable input component */
+/* ============ REUSABLE ============ */
 const Input = ({
   label,
   value,
@@ -276,53 +276,234 @@ function HeroPanel({
   showToast: (m: string) => void;
 }) {
   const [draft, setDraft] = useState(data.hero);
+  const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const save = () => {
     update({ hero: draft });
     showToast('Hero berhasil disimpan!');
   };
 
-  const addBg = () => setDraft({ ...draft, backgroundImages: [...draft.backgroundImages, ''] });
+  const addBg = () => {
+    setDraft({ ...draft, backgroundImages: [...draft.backgroundImages, ''] });
+  };
 
-  const removeBg = (i: number) =>
-    setDraft({ ...draft, backgroundImages: draft.backgroundImages.filter((_, idx) => idx !== i) });
+  const removeBg = (i: number) => {
+    if (draft.backgroundImages.length <= 1) {
+      alert('Minimal harus ada 1 foto background!');
+      return;
+    }
+    setDraft({
+      ...draft,
+      backgroundImages: draft.backgroundImages.filter((_, idx) => idx !== i),
+    });
+  };
+
+  const updateBgUrl = (i: number, url: string) => {
+    const arr = [...draft.backgroundImages];
+    arr[i] = url;
+    setDraft({ ...draft, backgroundImages: arr });
+  };
+
+  const compressImage = (file: File, maxWidth = 1600, quality = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return reject('Canvas error');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject('Gagal load gambar');
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject('Gagal baca file');
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (i: number, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('File harus berupa gambar!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal 5MB!');
+      return;
+    }
+    setLoadingIndex(i);
+    try {
+      const base64 = await compressImage(file);
+      updateBgUrl(i, base64);
+      showToast(`Foto ${i + 1} berhasil diupload!`);
+    } catch (err) {
+      alert('Gagal upload gambar: ' + err);
+    } finally {
+      setLoadingIndex(null);
+    }
+  };
+
+  const handleDrop = (i: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(i, file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
 
   return (
     <div>
       <h1 className="text-2xl font-extrabold text-[#2b1c3d] mb-1">Hero Section</h1>
-      <p className="text-xs text-gray-500 mb-6">Edit judul, deskripsi, dan background foto hero</p>
+      <p className="text-xs text-gray-500 mb-6">
+        Edit judul, deskripsi, dan background foto slideshow hero
+      </p>
 
       <Card title="📝 Teks">
-        <Input label="Judul Baris 1 (Ungu)" value={draft.title1} onChange={(v) => setDraft({ ...draft, title1: v })} />
-        <Input label="Judul Baris 2" value={draft.title2} onChange={(v) => setDraft({ ...draft, title2: v })} />
-        <Input label="Deskripsi" value={draft.desc} onChange={(v) => setDraft({ ...draft, desc: v })} multiline />
+        <Input
+          label="Judul Baris 1 (Ungu)"
+          value={draft.title1}
+          onChange={(v) => setDraft({ ...draft, title1: v })}
+        />
+        <Input
+          label="Judul Baris 2"
+          value={draft.title2}
+          onChange={(v) => setDraft({ ...draft, title2: v })}
+        />
+        <Input
+          label="Deskripsi"
+          value={draft.desc}
+          onChange={(v) => setDraft({ ...draft, desc: v })}
+          multiline
+        />
       </Card>
 
-      <Card title="🖼️ Background Foto (Slideshow)">
-        <p className="text-xs text-gray-500 mb-4">
-          Tambahkan URL foto. Foto akan berganti otomatis sebagai slideshow di belakang hero.
-        </p>
-        {draft.backgroundImages.map((img, i) => (
-          <div key={i} className="flex gap-2 mb-2">
-            <input
-              value={img}
-              onChange={(e) => {
-                const arr = [...draft.backgroundImages];
-                arr[i] = e.target.value;
-                setDraft({ ...draft, backgroundImages: arr });
-              }}
-              placeholder={`URL foto ${i + 1}`}
-              className="flex-1 px-4 py-3 rounded-xl border-2 border-[#ece6f5] bg-[#f7f5fb] text-sm outline-none focus:border-[#7b5ea7] focus:bg-white transition"
-            />
-            {draft.backgroundImages.length > 1 && <RemoveBtn onClick={() => removeBg(i)} />}
-          </div>
-        ))}
-        <div className="mt-3">
-          <AddBtn onClick={addBg} label="Tambah Foto Background" />
+      <Card title="🖼️ Background Slideshow (Foto Hero)">
+        <div className="text-xs text-gray-500 mb-5 leading-relaxed">
+          Foto akan bergantian otomatis sebagai slideshow. Kamu bisa:
+          <br />• 📋 <b>Paste URL</b> gambar, atau
+          <br />• 📤 <b>Upload dari komputer</b> (klik area upload / drag & drop)
+          <br />• 🗑️ <b>Hapus</b> foto yang tidak diinginkan
         </div>
+
+        <div className="space-y-4 mb-4">
+          {draft.backgroundImages.map((img, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border-2 border-[#ece6f5] bg-[#f7f5fb] p-4 transition hover:border-[#7b5ea7]/40"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-[#7b5ea7] text-white text-[11px] font-bold flex items-center justify-center">
+                    {i + 1}
+                  </div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-[#7b5ea7]">
+                    Foto {i + 1}
+                  </div>
+                </div>
+                {draft.backgroundImages.length > 1 && (
+                  <button
+                    onClick={() => removeBg(i)}
+                    className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition"
+                  >
+                    🗑️ Hapus
+                  </button>
+                )}
+              </div>
+
+              {img && (
+                <div className="relative mb-3 rounded-xl overflow-hidden bg-[#2b1c3d] h-40">
+                  <img
+                    src={img}
+                    alt={`Preview ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold tracking-wider">
+                    PREVIEW
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-3">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#7b5ea7] mb-1.5">
+                  🔗 URL Gambar
+                </label>
+                <input
+                  type="text"
+                  value={img.startsWith('data:') ? '(dari upload file)' : img}
+                  onChange={(e) => {
+                    if (!img.startsWith('data:')) updateBgUrl(i, e.target.value);
+                  }}
+                  disabled={img.startsWith('data:')}
+                  placeholder="https://contoh.com/foto.jpg"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-[#ece6f5] bg-white text-xs text-[#2b1c3d] font-medium outline-none focus:border-[#7b5ea7] focus:ring-4 focus:ring-[#7b5ea7]/10 transition disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              <div className="text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest mb-1.5">
+                — atau —
+              </div>
+
+              <div
+                onDrop={handleDrop(i)}
+                onDragOver={handleDragOver}
+                onClick={() => fileInputRefs.current[i]?.click()}
+                className="cursor-pointer rounded-xl border-2 border-dashed border-[#7b5ea7]/40 bg-white hover:bg-[#ece6f5] hover:border-[#7b5ea7] transition p-4 text-center"
+              >
+                {loadingIndex === i ? (
+                  <div className="text-xs font-bold text-[#7b5ea7]">
+                    ⏳ Memproses gambar...
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-2xl mb-1">📤</div>
+                    <div className="text-xs font-bold text-[#7b5ea7]">
+                      Upload / Drag foto ke sini
+                    </div>
+                    <div className="text-[10px] text-gray-400 mt-1">
+                      PNG, JPG, WEBP — Maks 5MB
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <input
+                ref={(el) => {
+                  fileInputRefs.current[i] = el;
+                }}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(i, file);
+                  e.target.value = '';
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <AddBtn onClick={addBg} label="Tambah Foto Background" />
       </Card>
 
-      <SaveBtn onClick={save} label="Simpan Hero" />
+      <div className="flex gap-3">
+        <SaveBtn onClick={save} label="Simpan Hero" />
+      </div>
     </div>
   );
 }
@@ -351,9 +532,7 @@ function StrukturPanel({
       {draft.map((item, i) => (
         <Card key={i} title={`Item ${i + 1}`}>
           <div className="flex justify-end -mt-10 mb-2">
-            <RemoveBtn
-              onClick={() => setDraft(draft.filter((_, idx) => idx !== i))}
-            />
+            <RemoveBtn onClick={() => setDraft(draft.filter((_, idx) => idx !== i))} />
           </div>
           <Input
             label="Jabatan"
@@ -608,10 +787,7 @@ function GalleryPanel({
       <div className="mb-4">
         <AddBtn
           onClick={() =>
-            setDraft([
-              ...draft,
-              { type: 'img', src: '', title: 'Foto Baru', desc: 'Deskripsi' },
-            ])
+            setDraft([...draft, { type: 'img', src: '', title: 'Foto Baru', desc: 'Deskripsi' }])
           }
           label="Tambah Media"
         />
@@ -724,7 +900,9 @@ function PartnersPanel({
               />
             </div>
             <div className="pb-4">
-              <RemoveBtn onClick={() => setDraft({ ...draft, support: draft.support.filter((_, x) => x !== i) })} />
+              <RemoveBtn
+                onClick={() => setDraft({ ...draft, support: draft.support.filter((_, x) => x !== i) })}
+              />
             </div>
           </div>
         ))}
@@ -760,7 +938,9 @@ function PartnersPanel({
               />
             </div>
             <div className="pb-4">
-              <RemoveBtn onClick={() => setDraft({ ...draft, sponsor: draft.sponsor.filter((_, x) => x !== i) })} />
+              <RemoveBtn
+                onClick={() => setDraft({ ...draft, sponsor: draft.sponsor.filter((_, x) => x !== i) })}
+              />
             </div>
           </div>
         ))}
