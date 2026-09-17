@@ -2,28 +2,25 @@ import { createClient } from '@supabase/supabase-js';
 
 /* ============================================
    KONFIGURASI SUPABASE
-   
-   Ganti 2 value di bawah dengan milik kamu:
-   - SUPABASE_URL: dari Settings → API → Project URL
-   - SUPABASE_ANON_KEY: dari Settings → API → anon public key
+   Mengambil dari Vercel Environment Variables
+   (VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY)
    ============================================ */
 
-const SUPABASE_URL = 'https://yvxnnvkwmcpgecznpdji.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2eG5udmt3bWNwZ2Vjem5wZGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2MzYxNTYsImV4cCI6MjEwNTIxMjE1Nn0.E-aWsSFgQydd0HoUbYp-eHg-VubAufqs81j942aSUSI';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error(
+    '⚠️ Supabase env vars tidak ditemukan! Pastikan sudah ditambahkan di Vercel Environment Variables atau buat file .env.local'
+  );
+}
 
-/* ============================================
-   FUNGSI-FUNGSI HELPER UNTUK DATA
-   ============================================ */
+export const supabase = createClient(SUPABASE_URL || '', SUPABASE_ANON_KEY || '');
 
 const TABLE_NAME = 'site_data';
 const ROW_KEY = 'main';
 
-/**
- * Ambil data dari Supabase
- * Return null kalau belum ada / error
- */
+/** Ambil data dari Supabase */
 export async function fetchSiteData(): Promise<any | null> {
   try {
     const { data, error } = await supabase
@@ -31,12 +28,10 @@ export async function fetchSiteData(): Promise<any | null> {
       .select('data')
       .eq('key', ROW_KEY)
       .single();
-
     if (error) {
       console.warn('Fetch error:', error.message);
       return null;
     }
-
     return data?.data ?? null;
   } catch (err) {
     console.warn('Fetch exception:', err);
@@ -44,28 +39,19 @@ export async function fetchSiteData(): Promise<any | null> {
   }
 }
 
-/**
- * Simpan data ke Supabase (upsert)
- * Return true kalau berhasil
- */
+/** Simpan data ke Supabase */
 export async function saveSiteData(payload: any): Promise<boolean> {
   try {
     const { error } = await supabase
       .from(TABLE_NAME)
       .upsert(
-        {
-          key: ROW_KEY,
-          data: payload,
-          updated_at: new Date().toISOString(),
-        },
+        { key: ROW_KEY, data: payload, updated_at: new Date().toISOString() },
         { onConflict: 'key' }
       );
-
     if (error) {
       console.error('Save error:', error.message);
       return false;
     }
-
     return true;
   } catch (err) {
     console.error('Save exception:', err);
@@ -73,30 +59,18 @@ export async function saveSiteData(payload: any): Promise<boolean> {
   }
 }
 
-/**
- * Subscribe ke perubahan real-time (opsional)
- * Callback akan dipanggil tiap kali data di Supabase berubah
- */
+/** Subscribe perubahan real-time */
 export function subscribeToChanges(callback: (newData: any) => void) {
   const channel = supabase
     .channel('site_data_changes')
     .on(
       'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: TABLE_NAME,
-        filter: `key=eq.${ROW_KEY}`,
-      },
+      { event: '*', schema: 'public', table: TABLE_NAME, filter: `key=eq.${ROW_KEY}` },
       (payload: any) => {
-        if (payload.new?.data) {
-          callback(payload.new.data);
-        }
+        if (payload.new?.data) callback(payload.new.data);
       }
     )
     .subscribe();
-
-  // Return unsubscribe function
   return () => {
     supabase.removeChannel(channel);
   };
