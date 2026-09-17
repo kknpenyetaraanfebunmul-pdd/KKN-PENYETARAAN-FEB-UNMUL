@@ -35,11 +35,14 @@ export async function loadData(): Promise<SiteData> {
     .maybeSingle();
 
   if (error) throw error;
+
+  // PERBAIKAN: Jika data tidak ditemukan, JANGAN auto-save default ke database.
+  // Cukup kembalikan data default ke UI. Ini mencegah data ter-reset saat HP
+  // gagal fetch (misal sinyal lemah atau RLS memblokir akses anon).
   if (!data) {
-    const initial = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    await saveData(initial);
-    return initial;
+    return JSON.parse(JSON.stringify(DEFAULT_DATA));
   }
+
   return data.content as SiteData;
 }
 

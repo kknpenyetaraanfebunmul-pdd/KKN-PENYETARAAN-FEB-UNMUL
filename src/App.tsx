@@ -50,8 +50,9 @@ export default function App() {
           setData(remote);
           setLocalData(remote);
         }
-      } catch {
-        // keep local data on failure
+      } catch (error) {
+        // PERBAIKAN: Log error supaya bisa didebug dari HP
+        console.error('[KKN] Gagal load data awal dari Supabase:', error);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -81,8 +82,9 @@ export default function App() {
             setSyncToast('Data diperbarui');
             setTimeout(() => setSyncToast(null), 2000);
           }
-        } catch {
-          // ignore
+        } catch (error) {
+          // PERBAIKAN: Log error visibility sync
+          console.error('[KKN] Gagal sync saat tab kembali aktif:', error);
         } finally {
           setSyncing(false);
         }
@@ -109,8 +111,9 @@ export default function App() {
             showToast('Data diperbarui');
           }
         }
-      } catch {
-        // ignore
+      } catch (error) {
+        // PERBAIKAN: Log error polling
+        console.error('[KKN] Gagal polling data:', error);
       }
     }, 30000);
     return () => clearInterval(interval);
@@ -291,6 +294,16 @@ function SiteView({
         {/* HEADER */}
         <header className="flex items-center justify-between py-4 sm:py-5 relative z-100">
           <div className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#2b1c3d] to-[#7b5ea7] bg-clip-text text-transparent tracking-[2px]">KKN.</div>
+
+          {/* PERBAIKAN: Tombol Refresh khusus Mobile */}
+          <button
+            onClick={() => window.location.reload()}
+            className="md:hidden text-xs font-semibold text-[#7b5ea7] bg-[#ece6f5] px-3 py-2 rounded-full active:scale-95 transition flex items-center gap-1"
+            aria-label="Refresh halaman"
+          >
+            {'\u{1F504}'} Refresh
+          </button>
+
           <nav className="hidden md:flex gap-1 text-xs font-semibold uppercase tracking-wider">
             {['Home', 'Struktur', 'Program Kerja', 'Gallery', 'Contact'].map((label, i) => (
               <a key={label} href={`#${['home', 'struktur', 'program', 'gallery', 'contact'][i]}`} className="px-4 py-2.5 rounded-full text-[#2b1c3d] hover:text-[#7b5ea7] hover:bg-[rgba(123,94,167,0.12)] transition">
@@ -485,18 +498,19 @@ function GallerySection({ items }: { items: SiteData['gallery'] }) {
 
     const pause = () => { paused = true; };
     const resume = () => { paused = false; };
+    const handleTouchEnd = () => { setTimeout(resume, 1500); };
 
     el.addEventListener('mouseenter', pause);
     el.addEventListener('mouseleave', resume);
     el.addEventListener('touchstart', pause, { passive: true });
-    el.addEventListener('touchend', () => setTimeout(resume, 1500), { passive: true });
+    el.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
       el.removeEventListener('mouseenter', pause);
       el.removeEventListener('mouseleave', resume);
       el.removeEventListener('touchstart', pause);
-      el.removeEventListener('touchend', resume);
+      el.removeEventListener('touchend', handleTouchEnd);
     };
   }, [items]);
 
