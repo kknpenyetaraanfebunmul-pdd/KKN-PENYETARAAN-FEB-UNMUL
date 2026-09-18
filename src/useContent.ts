@@ -7,16 +7,27 @@ const STORAGE_KEY = 'kkn-penyetaraan-content';
 export const ADMIN_SESSION_KEY = 'kkn-admin-session';
 export const ADMIN_PASSCODE = '110106';
 
+// Fungsi untuk mendeteksi apakah data masih menggunakan format lama
+function isOldFormat(struktur: any[]): boolean {
+  return Array.isArray(struktur) && struktur.length > 0 && 'role' in struktur[0];
+}
+
 function loadFromCache(): SiteContent | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<SiteContent>;
+    
+    // Jika cache masih format lama, buang cache struktur-nya
+    const hasOldFormat = parsed.struktur && isOldFormat(parsed.struktur);
+    
     return {
       ...defaultContent,
       ...parsed,
       hero: { ...defaultContent.hero, ...parsed.hero },
       footer: { ...defaultContent.footer, ...parsed.footer },
+      // Paksa pakai defaultContent jika format lama terdeteksi
+      struktur: hasOldFormat ? defaultContent.struktur : (parsed.struktur || defaultContent.struktur),
     };
   } catch {
     return null;
@@ -59,11 +70,17 @@ export function useContent() {
 
         if (data?.content) {
           const dbContent = data.content as SiteContent;
+          
+          // Cek apakah data dari Supabase masih format lama
+          const hasOldFormat = dbContent.struktur && isOldFormat(dbContent.struktur);
+          
           const merged: SiteContent = {
             ...defaultContent,
             ...dbContent,
             hero: { ...defaultContent.hero, ...dbContent.hero },
             footer: { ...defaultContent.footer, ...dbContent.footer },
+            // Paksa pakai defaultContent jika format lama terdeteksi
+            struktur: hasOldFormat ? defaultContent.struktur : (dbContent.struktur || defaultContent.struktur),
           };
           setContent(merged);
           cacheContent(merged);
