@@ -79,47 +79,44 @@ export default function Gallery({ content }: GalleryProps) {
         <div className="marquee-track flex gap-4 sm:gap-6 py-4">
           {duplicatedContent.map((item, idx) => {
             const realIndex = idx % content.length;
+            const isVideo = item.tipe === 'video'; // <-- Perbaikan logika
+
             return (
               <div
                 key={`${item.id}-${idx}`}
-                className="flex-shrink-0 w-[280px] sm:w-[360px] group cursor-pointer"
+                // PERBAIKAN: Hapus aspect-[4/5], pakai h-[...] dan w-fit agar rasio mengikuti file
+                className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
                 onClick={() => setLightbox(realIndex)}
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-lg aspect-[4/5] bg-card-bg">
-                  {item.tipe === 'photo' ? (
-                    <img
+                {isVideo ? (
+                  <>
+                    <video
                       src={item.url}
-                      alt={item.judul}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                  ) : (
-                    <>
-                      <video
-                        src={item.url}
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-dark-purple/20">
-                        <Play size={48} className="text-white fill-white" />
-                      </div>
-                    </>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark-purple/90 via-dark-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                    <h3 className="text-white font-bold text-lg mb-1">
-                      {item.judul}
-                    </h3>
-                    <p className="text-white/70 text-sm">{item.deskripsi}</p>
-                  </div>
-                </div>
-                <div className="mt-3 px-1">
-                  <h3 className="text-dark-purple font-bold text-base">
+                    <div className="absolute inset-0 flex items-center justify-center bg-dark-purple/20 pointer-events-none">
+                      <Play size={48} className="text-white fill-white opacity-80" />
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={item.judul}
+                    loading="lazy"
+                    className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
+                
+                {/* Overlay Judul & Deskripsi saat Hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-purple/90 via-dark-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 pointer-events-none">
+                  <h3 className="text-white font-bold text-lg mb-1">
                     {item.judul}
                   </h3>
-                  <p className="text-dark-purple/50 text-sm line-clamp-2">{item.deskripsi}</p>
+                  <p className="text-white/70 text-sm line-clamp-2">{item.deskripsi}</p>
                 </div>
               </div>
             );
@@ -164,18 +161,18 @@ export default function Gallery({ content }: GalleryProps) {
             className="max-w-4xl w-full max-h-[85vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {content[lightbox].tipe === 'photo' ? (
-              <img
-                src={content[lightbox].url}
-                alt={content[lightbox].judul}
-                className="max-w-full max-h-[75vh] rounded-2xl object-contain shadow-2xl"
-              />
-            ) : (
+            {content[lightbox].tipe === 'video' ? (
               <video
                 src={content[lightbox].url}
                 controls
                 autoPlay
                 className="max-w-full max-h-[75vh] rounded-2xl shadow-2xl"
+              />
+            ) : (
+              <img
+                src={content[lightbox].url}
+                alt={content[lightbox].judul}
+                className="max-w-full max-h-[75vh] rounded-2xl object-contain shadow-2xl"
               />
             )}
             <div className="mt-4 text-center">
