@@ -2,16 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 import type { SiteData } from './types';
 import { DEFAULT_DATA } from './data';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'ENV MISSING: VITE_SUPABASE_URL atau VITE_SUPABASE_ANON_KEY kosong. ' +
-    `Got URL=${supabaseUrl ? 'set' : 'empty'}, KEY=${supabaseAnonKey ? 'set' : 'empty'}. ` +
-    'Pastikan env var diset di Vercel project settings (bukan .env local saja).'
-  );
-}
+// Hardcoded untuk bypass masalah env variable
+const supabaseUrl = 'https://pncpkgnehujdlomvgnfs.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBuY3BrZ25laHVqZGxvbXZnbmZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NDMxNTAsImV4cCI6MjEwNTIxOTE1MH0._AUAJkR_aHB2fW7jyCG9K__5WmylcdKte8CIZ8ZIS9Y';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   realtime: { params: { eventsPerSecond: 2 } },
@@ -46,7 +39,10 @@ export async function loadData(): Promise<SiteData> {
     .eq('key', KEY)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error('loadData error:', error);
+    return getLocalData();
+  }
   if (!data) {
     const initial = JSON.parse(JSON.stringify(DEFAULT_DATA));
     await saveData(initial);
@@ -59,7 +55,10 @@ export async function saveData(content: SiteData): Promise<void> {
   const { error } = await supabase
     .from(TABLE)
     .upsert({ key: KEY, content }, { onConflict: 'key' });
-  if (error) throw error;
+  if (error) {
+    console.error('saveData error:', error);
+    throw error;
+  }
   setLocalData(content);
 }
 
