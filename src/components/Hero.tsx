@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
 import type { SiteContent } from '../types';
 
 interface HeroProps {
@@ -58,12 +57,13 @@ export default function Hero({ content }: HeroProps) {
           <p className="text-base sm:text-xl text-white/90 max-w-2xl mx-auto font-light mb-10 leading-relaxed">
             {content.subtitle}
           </p>
+          
+          {/* TOMBOL YANG SUDAH DIPERBAIKI */}
           <button
             onClick={scrollToStruktur}
-            className="inline-flex items-center gap-2 bg-primary-purple hover:bg-primary-purple/90 text-white font-semibold px-8 py-4 rounded-full text-base shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+            className="inline-flex items-center justify-center bg-primary-purple hover:bg-primary-purple/90 text-white font-semibold px-8 py-4 rounded-full text-base shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
           >
             {content.buttonText}
-            <ChevronDown size={20} className="animate-bounce" />
           </button>
         </div>
       </div>
