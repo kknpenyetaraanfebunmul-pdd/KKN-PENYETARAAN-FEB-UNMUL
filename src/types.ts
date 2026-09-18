@@ -15,7 +15,7 @@ export interface FooterData {
 export interface StrukturRow {
   id: string;
   jabatan: string;
-  deskripsi: string;
+  members: string[]; // <--- INI YANG DIUBAH (dari deskripsi: string)
   urutan: number;
 }
 
