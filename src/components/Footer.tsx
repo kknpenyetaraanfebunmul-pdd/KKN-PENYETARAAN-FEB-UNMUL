@@ -50,7 +50,8 @@ export default function Footer({ content, onAdminAccess }: FooterProps) {
 
   return (
     <>
-      <footer className="bg-dark-purple text-white py-10 px-5 sm:px-8">
+      {/* PERBAIKAN: pt-10 + pb-32 agar konten tidak ketutupan DockNav */}
+      <footer className="bg-dark-purple text-white pt-10 pb-32 px-5 sm:px-8">
         <div className="max-w-6xl mx-auto flex flex-col items-center gap-3 text-center">
           <button
             onClick={handleCopyrightClick}
