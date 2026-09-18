@@ -23,11 +23,11 @@ export const defaultContent: SiteContent = {
   },
   struktur: [
     { id: 'st1', jabatan: 'Ketua', members: ['Christoper Asben'], urutan: 1 },
-    { id: 'st2', jabatan: 'Sekretaris', members: ['Administrasi'], urutan: 2 },
-    { id: 'st3', jabatan: 'Bendahara', members: ['Keuangan'], urutan: 3 },
-    { id: 'st4', jabatan: 'Humas', members: ['Hubungan Masyarakat'], urutan: 4 },
-    { id: 'st5', jabatan: 'PDD', members: ['Publikasi & Dokumentasi'], urutan: 5 },
-    { id: 'st6', jabatan: 'Perdek', members: ['Perlengkapan & Dekorasi'], urutan: 6 },
+    { id: 'st2', jabatan: 'Sekretaris', members: ['Siti Az Zahra Rahmadani'], urutan: 2 },
+    { id: 'st3', jabatan: 'Bendahara', members: ['Muhammad Fahri Suryamuthar'], urutan: 3 },
+    { id: 'st4', jabatan: 'Humas', members: ['Muhammad Zaini Al Bukhari', 'Muhammad Fadillah'], urutan: 4 },
+    { id: 'st5', jabatan: 'PDD', members: ['Awlia Nur Rahman', 'Eka Rahmawati'], urutan: 5 },
+    { id: 'st6', jabatan: 'Perdek', members: ['Muhammad Rifadin', 'Purna Irawan'], urutan: 6 },
   ],
   programs: [
     {
