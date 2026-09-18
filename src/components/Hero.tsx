@@ -31,18 +31,39 @@ export default function Hero({ content }: HeroProps) {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {content.slides.map((slide, idx) => (
-        <div
-          key={slide.id}
-          className="absolute inset-0 transition-opacity duration-[1500ms] ease-in-out"
-          style={{
-            backgroundImage: `url(${slide.url})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: idx === currentSlide ? 1 : 0,
-          }}
-        />
-      ))}
+      {/* KEYFRAMES ANIMASI KEN BURNS */}
+      <style>{`
+        @keyframes kenburns-in {
+          0% { transform: scale(1); }
+          100% { transform: scale(1.15); }
+        }
+        @keyframes kenburns-out {
+          0% { transform: scale(1.15); }
+          100% { transform: scale(1); }
+        }
+      `}</style>
+
+      {content.slides.map((slide, idx) => {
+        const isActive = idx === currentSlide;
+        const isEven = idx % 2 === 0;
+        
+        return (
+          <div
+            key={slide.id}
+            className="absolute inset-0 transition-opacity duration-[1500ms] ease-in-out"
+            style={{
+              backgroundImage: `url(${slide.url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: isActive ? 1 : 0,
+              // Animasi HANYA berjalan pada slide yang aktif
+              animation: isActive
+                ? `${isEven ? 'kenburns-in' : 'kenburns-out'} 6s ease-out forwards`
+                : 'none',
+            }}
+          />
+        );
+      })}
 
       <div className="absolute inset-0 bg-gradient-to-b from-dark-purple/70 via-dark-purple/50 to-dark-purple/80" />
 
@@ -58,7 +79,6 @@ export default function Hero({ content }: HeroProps) {
             {content.subtitle}
           </p>
           
-          {/* TOMBOL YANG SUDAH DIPERBAIKI */}
           <button
             onClick={scrollToStruktur}
             className="inline-flex items-center justify-center bg-primary-purple hover:bg-primary-purple/90 text-white font-semibold px-8 py-4 rounded-full text-base shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
