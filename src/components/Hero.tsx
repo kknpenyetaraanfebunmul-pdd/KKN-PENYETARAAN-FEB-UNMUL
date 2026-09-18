@@ -31,14 +31,25 @@ export default function Hero({ content }: HeroProps) {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* KEYFRAMES ANIMASI KEN BURNS */}
       <style>{`
+        /* Slide Aktif Genap: Zoom In (1 -> 1.15) */
         @keyframes kenburns-in {
           0% { transform: scale(1); }
           100% { transform: scale(1.15); }
         }
+        /* Slide Aktif Ganjil: Zoom Out (1.15 -> 1) */
         @keyframes kenburns-out {
           0% { transform: scale(1.15); }
+          100% { transform: scale(1); }
+        }
+        /* Slide Nonaktif Genap: Kembali ke Scale 1 (1.15 -> 1) saat fade out */
+        @keyframes reset-from-zoom {
+          0% { transform: scale(1.15); }
+          100% { transform: scale(1); }
+        }
+        /* Slide Nonaktif Ganjil: Tetap di Scale 1 */
+        @keyframes stay-still {
+          0% { transform: scale(1); }
           100% { transform: scale(1); }
         }
       `}</style>
@@ -46,6 +57,19 @@ export default function Hero({ content }: HeroProps) {
       {content.slides.map((slide, idx) => {
         const isActive = idx === currentSlide;
         const isEven = idx % 2 === 0;
+        
+        let animationName: string;
+        let animationDuration: string;
+        
+        if (isActive) {
+          // Slide yang aktif: animasi zoom
+          animationName = isEven ? 'kenburns-in' : 'kenburns-out';
+          animationDuration = '5s';
+        } else {
+          // Slide yang nonaktif: animasi reset ke scale 1 selama fade out
+          animationName = isEven ? 'reset-from-zoom' : 'stay-still';
+          animationDuration = '1.5s';
+        }
         
         return (
           <div
@@ -56,10 +80,7 @@ export default function Hero({ content }: HeroProps) {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               opacity: isActive ? 1 : 0,
-              // Animasi HANYA berjalan pada slide yang aktif
-              animation: isActive
-                ? `${isEven ? 'kenburns-in' : 'kenburns-out'} 6s ease-out forwards`
-                : 'none',
+              animation: `${animationName} ${animationDuration} ease-out forwards`,
             }}
           />
         );
