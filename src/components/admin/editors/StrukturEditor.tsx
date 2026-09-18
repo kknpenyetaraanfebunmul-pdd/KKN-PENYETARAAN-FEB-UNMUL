@@ -14,7 +14,12 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
       ...prev,
       struktur: [
         ...prev.struktur,
-        { id: generateId('st'), role: '', members: [''] }, // Mulai dengan 1 nama kosong
+        { 
+          id: generateId('st'), 
+          jabatan: '', // <-- Ubah dari 'role' ke 'jabatan'
+          members: [''], 
+          urutan: prev.struktur.length + 1 
+        },
       ],
     }));
   };
@@ -32,28 +37,30 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
     updateDraft((prev) => ({
       ...prev,
       struktur: prev.struktur.map((item) =>
-        item.id === id ? { ...item, role: value } : item
+        item.id === id ? { ...item, jabatan: value } : item // <-- Ubah ke 'jabatan'
       ),
     }));
   };
 
-  // Menambah nama anggota di jabatan tertentu
+  // Menambah nama anggota di jabatan tertentu (dengan pengaman || [])
   const addMember = (roleId: string) => {
     updateDraft((prev) => ({
       ...prev,
       struktur: prev.struktur.map((item) =>
-        item.id === roleId ? { ...item, members: [...item.members, ''] } : item
+        item.id === roleId 
+          ? { ...item, members: [...(item.members || []), ''] } 
+          : item
       ),
     }));
   };
 
-  // Mengubah nama anggota
+  // Mengubah nama anggota (dengan pengaman || [])
   const updateMember = (roleId: string, index: number, value: string) => {
     updateDraft((prev) => ({
       ...prev,
       struktur: prev.struktur.map((item) => {
         if (item.id === roleId) {
-          const newMembers = [...item.members];
+          const newMembers = [...(item.members || [])];
           newMembers[index] = value;
           return { ...item, members: newMembers };
         }
@@ -62,14 +69,13 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
     }));
   };
 
-  // Menghapus nama anggota
+  // Menghapus nama anggota (dengan pengaman || [])
   const removeMember = (roleId: string, index: number) => {
     updateDraft((prev) => ({
       ...prev,
       struktur: prev.struktur.map((item) => {
         if (item.id === roleId) {
-          const newMembers = item.members.filter((_, i) => i !== index);
-          // Pastikan minimal ada 1 kolom kosong agar tidak error
+          const newMembers = (item.members || []).filter((_, i) => i !== index);
           return { ...item, members: newMembers.length > 0 ? newMembers : [''] };
         }
         return item;
@@ -80,8 +86,8 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
   // Fungsi untuk mendeteksi tombol Enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, roleId: string) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // Mencegah form ter-submit
-      addMember(roleId);  // Tambah kolom baru
+      e.preventDefault(); 
+      addMember(roleId);  
     }
   };
 
@@ -104,7 +110,7 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
           <div className="w-1/3 flex items-start gap-2">
             <input
               type="text"
-              value={item.role}
+              value={item.jabatan || ''} // <-- Gunakan item.jabatan
               onChange={(e) => updateRole(item.id, e.target.value)}
               placeholder="Nama jabatan (cth: Ketua)"
               className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
@@ -120,17 +126,18 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
 
           {/* Kolom Kanan: Daftar Nama Anggota */}
           <div className="flex-1 space-y-2">
-            {item.members.map((member, index) => (
+            {/* PENGAMAN UTAMA: (item.members || []) */}
+            {(item.members || []).map((member, index) => (
               <div key={index} className="flex items-center gap-2">
                 <input
                   type="text"
-                  value={member}
+                  value={member || ''}
                   onChange={(e) => updateMember(item.id, index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, item.id)}
                   placeholder={`Nama anggota ${index + 1}`}
                   className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
                 />
-                {item.members.length > 1 && (
+                {item.members && item.members.length > 1 && (
                   <button
                     onClick={() => removeMember(item.id, index)}
                     className="text-red-400 hover:text-red-500 p-1"
