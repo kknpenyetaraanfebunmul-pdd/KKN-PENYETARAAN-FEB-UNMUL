@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SiteContent, StrukturMember } from './types';
+import type { SiteContent, StrukturMember, PartnerRow } from './types';
 import { defaultContent } from './defaultContent';
 import { supabase } from './lib/supabase';
 
@@ -11,25 +11,21 @@ export const ADMIN_PASSCODE = '110106';
 // FUNGSI MIGRASI: Mengubah data lama ke format baru
 // ============================================
 
-// Deteksi apakah data masih format lama (role/description)
 function isOldStrukturFormat(struktur: any[]): boolean {
   if (!Array.isArray(struktur) || struktur.length === 0) return false;
   const first = struktur[0];
   return 'role' in first || 'description' in first;
 }
 
-// Deteksi apakah members masih berupa string[] (bukan objek)
 function isOldMembersFormat(members: any[]): boolean {
   if (!Array.isArray(members) || members.length === 0) return false;
   return typeof members[0] === 'string';
 }
 
-// Migrasi struktur ke format baru
 function migrateStruktur(struktur: any[]): any[] {
   if (!Array.isArray(struktur)) return defaultContent.struktur;
   
   return struktur.map((item, idx) => {
-    // Handle format sangat lama (role + description)
     if ('role' in item) {
       return {
         id: item.id || `st_${idx}`,
@@ -39,18 +35,15 @@ function migrateStruktur(struktur: any[]): any[] {
       };
     }
     
-    // Handle format menengah (jabatan + members: string[])
     let newMembers: StrukturMember[] = [];
     if (Array.isArray(item.members)) {
       if (isOldMembersFormat(item.members)) {
-        // Ubah string[] -> StrukturMember[]
         newMembers = item.members.map((name: string) => ({
           name: name || '',
           nim: '',
           photo: '',
         }));
       } else {
-        // Sudah format baru, tapi pastikan propertinya lengkap
         newMembers = item.members.map((m: any) => ({
           name: m?.name || '',
           nim: m?.nim || '',
@@ -68,11 +61,30 @@ function migrateStruktur(struktur: any[]): any[] {
   });
 }
 
-// Sanitasi konten secara keseluruhan
+// FUNGSI BARU: Migrasi Partner (Support & Sponsor)
+function migratePartners(partners: any[], grup: 'support' | 'sponsor'): PartnerRow[] {
+  if (!Array.isArray(partners)) return [];
+  return partners.map((p, idx) => ({
+    id: p.id || `p_${idx}`,
+    grup: p.grup || grup,
+    nama: p.nama || p.name || '', // Handle 'nama' atau 'name'
+    logo_url: p.logo_url || p.logo || '', // Handle 'logo_url' atau 'logo'
+    urutan: p.urutan || idx + 1,
+  }));
+}
+
 function sanitizeContent(content: Partial<SiteContent>): SiteContent {
   const struktur = content.struktur 
     ? migrateStruktur(content.struktur as any[])
     : defaultContent.struktur;
+
+  const supportBy = content.supportBy
+    ? migratePartners(content.supportBy as any[], 'support')
+    : defaultContent.supportBy;
+
+  const sponsorBy = content.sponsorBy
+    ? migratePartners(content.sponsorBy as any[], 'sponsor')
+    : defaultContent.sponsorBy;
 
   return {
     ...defaultContent,
@@ -80,11 +92,11 @@ function sanitizeContent(content: Partial<SiteContent>): SiteContent {
     hero: { ...defaultContent.hero, ...content.hero },
     footer: { ...defaultContent.footer, ...content.footer },
     struktur,
+    supportBy,
+    sponsorBy,
     programs: content.programs || defaultContent.programs,
     gallery: content.gallery || defaultContent.gallery,
     contacts: content.contacts || defaultContent.contacts,
-    supportBy: content.supportBy || defaultContent.supportBy,
-    sponsorBy: content.sponsorBy || defaultContent.sponsorBy,
   } as SiteContent;
 }
 
@@ -142,7 +154,6 @@ export function useContent() {
         }
 
         if (data?.content) {
-          // SANITASI: Migrasi data lama ke format baru secara otomatis
           const sanitized = sanitizeContent(data.content as Partial<SiteContent>);
           setContent(sanitized);
           cacheContent(sanitized);
