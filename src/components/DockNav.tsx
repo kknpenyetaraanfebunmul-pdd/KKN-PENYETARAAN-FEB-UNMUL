@@ -1,104 +1,96 @@
-import { useState, useEffect } from 'react';
-import { useContent, ADMIN_SESSION_KEY } from './useContent';
-import DockNav from './components/DockNav';
-import Hero from './components/Hero';
-import Struktur from './components/Struktur';
-import Program from './components/Program';
-import Gallery from './components/Gallery';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
-import AdminDashboard from './components/admin/AdminDashboard';
+import { Home, Users, Briefcase, Images, Mail } from 'lucide-react';
 
-const sections = ['home', 'struktur', 'program', 'gallery', 'contact'];
+const dockItems = [
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'struktur', label: 'Struktur', icon: Users },
+  { id: 'program', label: 'Program', icon: Briefcase },
+  { id: 'gallery', label: 'Gallery', icon: Images },
+  { id: 'contact', label: 'Contact', icon: Mail },
+];
 
-export default function App() {
-  const { content, updateContent, resetContent } = useContent();
-  const [activeSection, setActiveSection] = useState('home');
-  const [showDock, setShowDock] = useState(false);
-  const [adminMode, setAdminMode] = useState(false);
+interface DockNavProps {
+  activeSection: string;
+  visible: boolean;
+}
 
-  useEffect(() => {
-    if (adminMode) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
+export default function DockNav({ activeSection, visible }: DockNavProps) {
+  const handleNav = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 70;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
-  }, [adminMode]);
-
-  useEffect(() => {
-    if (adminMode) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
-    );
-
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    // Logika: Tampilkan DockNav hanya SETELAH user scroll melewati Hero
-    const onScroll = () => {
-      const hero = document.getElementById('home');
-      if (hero) {
-        const rect = hero.getBoundingClientRect();
-        // Hero dianggap lewat jika bagian bawahnya sudah masuk 70% viewport
-        const passed = rect.bottom < window.innerHeight * 0.7;
-        setShowDock(passed);
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', onScroll);
-    };
-  }, [adminMode]);
-
-  const handleAdminAccess = () => setAdminMode(true);
-  const handleAdminExit = () => setAdminMode(false);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    setAdminMode(false);
   };
 
-  if (adminMode) {
-    return (
-      <AdminDashboard
-        content={content}
-        updateContent={updateContent}
-        resetContent={resetContent}
-        onExit={handleAdminExit}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-bg">
-      <main>
-        <Hero content={content.hero} />
-        <Struktur content={content.struktur} />
-        <Program content={content.programs} />
-        <Gallery content={content.gallery} />
-        <Contact
-          contacts={content.contacts}
-          supportBy={content.supportBy}
-          sponsorBy={content.sponsorBy}
-        />
-      </main>
-      <Footer content={content.footer} onAdminAccess={handleAdminAccess} />
-      <DockNav activeSection={activeSection} visible={showDock} />
-    </div>
+    <>
+      {/* MOBILE: Dock di bawah */}
+      <div
+        className={`lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 ${
+          visible
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-20 pointer-events-none'
+        }`}
+      >
+        <div className="flex items-center gap-1 bg-dark-purple/90 backdrop-blur-xl rounded-full px-3 py-2 shadow-2xl border border-white/10">
+          {dockItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className={`relative flex items-center justify-center rounded-full transition-all duration-300 ${
+                  isActive
+                    ? 'w-12 h-12 bg-primary-purple text-white'
+                    : 'w-10 h-10 text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                aria-label={item.label}
+              >
+                <Icon size={isActive ? 22 : 18} />
+                {isActive && (
+                  <span className="absolute -top-9 bg-dark-purple text-white text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* DESKTOP: Dock di kanan, vertikal, lebih besar */}
+      <div
+        className={`hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 transition-all duration-500 ${
+          visible
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 translate-x-24 pointer-events-none'
+        }`}
+      >
+        <div className="flex flex-col items-center gap-2 bg-dark-purple/90 backdrop-blur-xl rounded-3xl px-3 py-4 shadow-2xl border border-white/10">
+          {dockItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className={`group relative flex items-center justify-center rounded-2xl transition-all duration-300 ${
+                  isActive
+                    ? 'w-16 h-16 bg-primary-purple text-white shadow-lg shadow-primary-purple/40'
+                    : 'w-14 h-14 text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+                aria-label={item.label}
+              >
+                <Icon size={isActive ? 28 : 22} />
+                <span className="absolute right-full mr-4 bg-dark-purple text-white text-sm font-semibold px-4 py-2 rounded-xl whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
