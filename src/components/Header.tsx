@@ -11,7 +11,7 @@ const navItems = [
 
 interface HeaderProps {
   activeSection: string;
-  visible?: boolean; // <-- Prop baru
+  visible?: boolean;
 }
 
 export default function Header({ activeSection, visible = true }: HeaderProps) {
