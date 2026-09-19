@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SiteContent } from './types';
+import type { SiteContent, StrukturMember } from './types';
 import { defaultContent } from './defaultContent';
 import { supabase } from './lib/supabase';
 
@@ -7,28 +7,97 @@ const STORAGE_KEY = 'kkn-penyetaraan-content';
 export const ADMIN_SESSION_KEY = 'kkn-admin-session';
 export const ADMIN_PASSCODE = '110106';
 
-// Fungsi untuk mendeteksi apakah data masih menggunakan format lama
-function isOldFormat(struktur: any[]): boolean {
-  return Array.isArray(struktur) && struktur.length > 0 && 'role' in struktur[0];
+// ============================================
+// FUNGSI MIGRASI: Mengubah data lama ke format baru
+// ============================================
+
+// Deteksi apakah data masih format lama (role/description)
+function isOldStrukturFormat(struktur: any[]): boolean {
+  if (!Array.isArray(struktur) || struktur.length === 0) return false;
+  const first = struktur[0];
+  return 'role' in first || 'description' in first;
 }
+
+// Deteksi apakah members masih berupa string[] (bukan objek)
+function isOldMembersFormat(members: any[]): boolean {
+  if (!Array.isArray(members) || members.length === 0) return false;
+  return typeof members[0] === 'string';
+}
+
+// Migrasi struktur ke format baru
+function migrateStruktur(struktur: any[]): any[] {
+  if (!Array.isArray(struktur)) return defaultContent.struktur;
+  
+  return struktur.map((item, idx) => {
+    // Handle format sangat lama (role + description)
+    if ('role' in item) {
+      return {
+        id: item.id || `st_${idx}`,
+        jabatan: item.role || '',
+        members: [{ name: item.description || '', nim: '', photo: '' }],
+        urutan: item.urutan || idx + 1,
+      };
+    }
+    
+    // Handle format menengah (jabatan + members: string[])
+    let newMembers: StrukturMember[] = [];
+    if (Array.isArray(item.members)) {
+      if (isOldMembersFormat(item.members)) {
+        // Ubah string[] -> StrukturMember[]
+        newMembers = item.members.map((name: string) => ({
+          name: name || '',
+          nim: '',
+          photo: '',
+        }));
+      } else {
+        // Sudah format baru, tapi pastikan propertinya lengkap
+        newMembers = item.members.map((m: any) => ({
+          name: m?.name || '',
+          nim: m?.nim || '',
+          photo: m?.photo || '',
+        }));
+      }
+    }
+    
+    return {
+      id: item.id || `st_${idx}`,
+      jabatan: item.jabatan || '',
+      members: newMembers.length > 0 ? newMembers : [{ name: '', nim: '', photo: '' }],
+      urutan: item.urutan || idx + 1,
+    };
+  });
+}
+
+// Sanitasi konten secara keseluruhan
+function sanitizeContent(content: Partial<SiteContent>): SiteContent {
+  const struktur = content.struktur 
+    ? migrateStruktur(content.struktur as any[])
+    : defaultContent.struktur;
+
+  return {
+    ...defaultContent,
+    ...content,
+    hero: { ...defaultContent.hero, ...content.hero },
+    footer: { ...defaultContent.footer, ...content.footer },
+    struktur,
+    programs: content.programs || defaultContent.programs,
+    gallery: content.gallery || defaultContent.gallery,
+    contacts: content.contacts || defaultContent.contacts,
+    supportBy: content.supportBy || defaultContent.supportBy,
+    sponsorBy: content.sponsorBy || defaultContent.sponsorBy,
+  } as SiteContent;
+}
+
+// ============================================
+// CACHE MANAGEMENT
+// ============================================
 
 function loadFromCache(): SiteContent | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<SiteContent>;
-    
-    // Jika cache masih format lama, buang cache struktur-nya
-    const hasOldFormat = parsed.struktur && isOldFormat(parsed.struktur);
-    
-    return {
-      ...defaultContent,
-      ...parsed,
-      hero: { ...defaultContent.hero, ...parsed.hero },
-      footer: { ...defaultContent.footer, ...parsed.footer },
-      // Paksa pakai defaultContent jika format lama terdeteksi
-      struktur: hasOldFormat ? defaultContent.struktur : (parsed.struktur || defaultContent.struktur),
-    };
+    return sanitizeContent(parsed);
   } catch {
     return null;
   }
@@ -41,6 +110,10 @@ function cacheContent(content: SiteContent) {
     // ignore write errors
   }
 }
+
+// ============================================
+// HOOK UTAMA
+// ============================================
 
 export function useContent() {
   const [content, setContent] = useState<SiteContent>(() => {
@@ -69,21 +142,10 @@ export function useContent() {
         }
 
         if (data?.content) {
-          const dbContent = data.content as SiteContent;
-          
-          // Cek apakah data dari Supabase masih format lama
-          const hasOldFormat = dbContent.struktur && isOldFormat(dbContent.struktur);
-          
-          const merged: SiteContent = {
-            ...defaultContent,
-            ...dbContent,
-            hero: { ...defaultContent.hero, ...dbContent.hero },
-            footer: { ...defaultContent.footer, ...dbContent.footer },
-            // Paksa pakai defaultContent jika format lama terdeteksi
-            struktur: hasOldFormat ? defaultContent.struktur : (dbContent.struktur || defaultContent.struktur),
-          };
-          setContent(merged);
-          cacheContent(merged);
+          // SANITASI: Migrasi data lama ke format baru secara otomatis
+          const sanitized = sanitizeContent(data.content as Partial<SiteContent>);
+          setContent(sanitized);
+          cacheContent(sanitized);
         }
       } catch (err) {
         console.error('Failed to load content:', err);
@@ -133,6 +195,10 @@ export function useContent() {
 
   return { content, updateContent, resetContent, loading };
 }
+
+// ============================================
+// UTILITIES
+// ============================================
 
 export function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;

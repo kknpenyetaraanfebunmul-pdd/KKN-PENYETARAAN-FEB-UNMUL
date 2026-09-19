@@ -12,10 +12,17 @@ export interface FooterData {
   madeWith: string;
 }
 
+// STRUKTUR BARU: Member sebagai objek, bukan string
+export interface StrukturMember {
+  name: string;
+  nim: string;
+  photo: string;
+}
+
 export interface StrukturRow {
   id: string;
   jabatan: string;
-  members: string[]; // <--- INI YANG DIUBAH (dari deskripsi: string)
+  members: StrukturMember[]; // <-- Ini yang berubah
   urutan: number;
 }
 
