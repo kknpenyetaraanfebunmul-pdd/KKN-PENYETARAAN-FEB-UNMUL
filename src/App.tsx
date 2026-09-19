@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useContent, ADMIN_SESSION_KEY } from './useContent';
+import Header from './components/Header';
 import DockNav from './components/DockNav';
 import Hero from './components/Hero';
 import Struktur from './components/Struktur';
@@ -44,12 +45,13 @@ export default function App() {
       if (el) observer.observe(el);
     });
 
-    // Logika: Tampilkan DockNav hanya SETELAH user scroll melewati Hero
+    // Logika: 
+    // - showDock = true  -> user sudah scroll melewati Hero (Header hilang, DockNav muncul)
+    // - showDock = false -> user masih di Hero (Header muncul, DockNav hilang)
     const onScroll = () => {
       const hero = document.getElementById('home');
       if (hero) {
         const rect = hero.getBoundingClientRect();
-        // Hero dianggap lewat jika bagian bawahnya sudah masuk 70% viewport
         const passed = rect.bottom < window.innerHeight * 0.7;
         setShowDock(passed);
       }
@@ -84,8 +86,20 @@ export default function App() {
     );
   }
 
+  // Header hanya muncul saat user masih di Hero (belum scroll)
+  // Pakai wrapper dengan animasi fade & slide agar transisinya halus
   return (
     <div className="min-h-screen bg-bg">
+      <div
+        className={`transition-all duration-500 ${
+          showDock
+            ? 'opacity-0 -translate-y-4 pointer-events-none'
+            : 'opacity-100 translate-y-0'
+        }`}
+      >
+        <Header activeSection={activeSection} />
+      </div>
+
       <main>
         <Hero content={content.hero} />
         <Struktur content={content.struktur} />
