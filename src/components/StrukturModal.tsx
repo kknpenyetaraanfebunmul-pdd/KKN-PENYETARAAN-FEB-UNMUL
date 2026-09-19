@@ -48,9 +48,6 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
 
         {/* Daftar Anggota */}
         <div className="p-5 sm:p-8">
-          <p className="text-sm text-dark-purple/60 mb-5 text-center">
-            {data.members.length} Anggota
-          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {data.members.map((member, idx) => (
               <div
