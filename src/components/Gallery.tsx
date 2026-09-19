@@ -38,8 +38,25 @@ export default function Gallery({ content }: GalleryProps) {
     };
   }, [lightbox, closeLightbox, nextImage, prevImage]);
 
-  // Duplikasi konten agar marquee bisa loop tanpa putus
-  const duplicatedContent = [...content, ...content];
+  // ============================================================
+  // LOGIKA INFINITY MARQUEE
+  // Pastikan konten cukup lebar agar tidak ada gap saat looping
+  // ============================================================
+  const itemCount = Math.max(content.length, 1);
+  
+  // Minimal 12 item per "half" agar selalu lebih lebar dari layar
+  const itemsPerHalf = 12;
+  const repeatCount = Math.max(1, Math.ceil(itemsPerHalf / itemCount));
+  
+  // Half pertama: konten diulang sebanyak repeatCount
+  const halfContent = Array(repeatCount).fill(content).flat();
+  
+  // Gabungkan 2 half yang identik (untuk animasi -50% yang seamless)
+  const extendedContent = [...halfContent, ...halfContent];
+  
+  // Durasi animasi proporsional dengan jumlah item (biar kecepatan konsisten)
+  // ~4 detik per item, minimal 40 detik
+  const animationDuration = Math.max(40, halfContent.length * 4);
 
   return (
     <section id="gallery" className="py-20 sm:py-28 overflow-hidden">
@@ -50,8 +67,9 @@ export default function Gallery({ content }: GalleryProps) {
           100% { transform: translateX(-50%); }
         }
         .marquee-track {
-          animation: marquee-scroll 40s linear infinite;
+          animation: marquee-scroll linear infinite;
           width: max-content;
+          will-change: transform;
         }
         .marquee-track:hover {
           animation-play-state: paused;
@@ -76,15 +94,17 @@ export default function Gallery({ content }: GalleryProps) {
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
 
-        <div className="marquee-track flex gap-4 sm:gap-6 py-4">
-          {duplicatedContent.map((item, idx) => {
+        <div
+          className="marquee-track flex gap-4 sm:gap-6 py-4"
+          style={{ animationDuration: `${animationDuration}s` }}
+        >
+          {extendedContent.map((item, idx) => {
             const realIndex = idx % content.length;
-            const isVideo = item.tipe === 'video'; // <-- Perbaikan logika
+            const isVideo = item.tipe === 'video';
 
             return (
               <div
                 key={`${item.id}-${idx}`}
-                // PERBAIKAN: Hapus aspect-[4/5], pakai h-[...] dan w-fit agar rasio mengikuti file
                 className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
                 onClick={() => setLightbox(realIndex)}
               >
@@ -110,13 +130,15 @@ export default function Gallery({ content }: GalleryProps) {
                     className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 )}
-                
+
                 {/* Overlay Judul & Deskripsi saat Hover */}
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-purple/90 via-dark-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 pointer-events-none">
                   <h3 className="text-white font-bold text-lg mb-1">
                     {item.judul}
                   </h3>
-                  <p className="text-white/70 text-sm line-clamp-2">{item.deskripsi}</p>
+                  <p className="text-white/70 text-sm line-clamp-2">
+                    {item.deskripsi}
+                  </p>
                 </div>
               </div>
             );
