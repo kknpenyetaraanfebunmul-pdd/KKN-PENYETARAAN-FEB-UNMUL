@@ -11,9 +11,10 @@ const navItems = [
 
 interface HeaderProps {
   activeSection: string;
+  visible?: boolean; // <-- Prop baru
 }
 
-export default function Header({ activeSection }: HeaderProps) {
+export default function Header({ activeSection, visible = true }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -34,10 +35,14 @@ export default function Header({ activeSection }: HeaderProps) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
         scrolled
           ? 'bg-dark-purple/95 backdrop-blur-md shadow-lg py-2'
           : 'bg-transparent py-4'
+      } ${
+        visible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 -translate-y-full pointer-events-none'
       }`}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 flex items-center justify-between">
