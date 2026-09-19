@@ -56,7 +56,7 @@ export default function Gallery({ content }: GalleryProps) {
   
   // Durasi animasi proporsional dengan jumlah item (biar kecepatan konsisten)
   // ~4 detik per item, minimal 40 detik
-  const animationDuration = Math.max(40, halfContent.length * 4);
+  const animationDuration = Math.max(40, halfContent.length * 8);
 
   return (
     <section id="gallery" className="py-20 sm:py-28 overflow-hidden">
