@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import type { SiteContent } from '../types';
+import type { SiteContent, PartnerRow } from '../types';
+import PartnerModal from './PartnerModal';
 
 interface ContactProps {
   contacts: SiteContent['contacts'];
@@ -26,6 +28,8 @@ const platformIcons: Record<string, JSX.Element> = {
 };
 
 export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps) {
+  const [selectedPartner, setSelectedPartner] = useState<PartnerRow | null>(null);
+
   return (
     <section id="contact" className="py-20 sm:py-28 px-5 sm:px-8">
       <div className="max-w-5xl mx-auto">
@@ -70,46 +74,68 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
           ))}
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-12">
+          {/* SUPPORT BY */}
           <div className="text-center">
             <h3 className="text-xl font-bold text-dark-purple mb-6">Support By</h3>
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
               {supportBy.map((partner) => (
-                <div
+                <button
                   key={partner.id}
-                  className="bg-card-bg rounded-2xl px-6 py-3 flex items-center justify-center border border-bubble-light hover:shadow-md transition-all"
+                  onClick={() => setSelectedPartner(partner)}
+                  className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <img
-                    src={partner.logo}
-                    alt={partner.name}
-                    className="h-10 object-contain"
-                    loading="lazy"
-                  />
-                </div>
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl p-4 flex items-center justify-center border border-bubble-light shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.nama}
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="text-sm font-semibold text-dark-purple/70 group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                    {partner.nama}
+                  </p>
+                </button>
               ))}
             </div>
           </div>
 
+          {/* SPONSOR BY */}
           <div className="text-center">
             <h3 className="text-xl font-bold text-dark-purple mb-6">Sponsor By</h3>
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
               {sponsorBy.map((partner) => (
-                <div
+                <button
                   key={partner.id}
-                  className="bg-card-bg rounded-2xl px-6 py-3 flex items-center justify-center border border-bubble-light hover:shadow-md transition-all"
+                  onClick={() => setSelectedPartner(partner)}
+                  className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <img
-                    src={partner.logo}
-                    alt={partner.name}
-                    className="h-10 object-contain"
-                    loading="lazy"
-                  />
-                </div>
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl p-4 flex items-center justify-center border border-bubble-light shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.nama}
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="text-sm font-semibold text-dark-purple/70 group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                    {partner.nama}
+                  </p>
+                </button>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* MODAL */}
+      {selectedPartner && (
+        <PartnerModal
+          partner={selectedPartner}
+          onClose={() => setSelectedPartner(null)}
+        />
+      )}
     </section>
   );
 }
