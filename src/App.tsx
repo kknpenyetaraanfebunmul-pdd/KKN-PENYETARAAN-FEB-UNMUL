@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useContent, ADMIN_SESSION_KEY } from './useContent';
-import Header from './components/Header';
 import DockNav from './components/DockNav';
 import Hero from './components/Hero';
 import Struktur from './components/Struktur';
@@ -45,11 +44,14 @@ export default function App() {
       if (el) observer.observe(el);
     });
 
+    // Logika: Tampilkan DockNav hanya SETELAH user scroll melewati Hero
     const onScroll = () => {
       const hero = document.getElementById('home');
       if (hero) {
         const rect = hero.getBoundingClientRect();
-        setShowDock(rect.bottom < window.innerHeight * 0.5);
+        // Hero dianggap lewat jika bagian bawahnya sudah masuk 70% viewport
+        const passed = rect.bottom < window.innerHeight * 0.7;
+        setShowDock(passed);
       }
     };
 
@@ -63,7 +65,6 @@ export default function App() {
   }, [adminMode]);
 
   const handleAdminAccess = () => setAdminMode(true);
-
   const handleAdminExit = () => setAdminMode(false);
 
   const handleLogout = () => {
@@ -85,7 +86,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg">
-      <Header activeSection={activeSection} />
       <main>
         <Hero content={content.hero} />
         <Struktur content={content.struktur} />
