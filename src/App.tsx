@@ -45,7 +45,7 @@ export default function App() {
       if (el) observer.observe(el);
     });
 
-    // Logika: 
+    // Logika:
     // - showDock = true  -> user sudah scroll melewati Hero (Header hilang, DockNav muncul)
     // - showDock = false -> user masih di Hero (Header muncul, DockNav hilang)
     const onScroll = () => {
@@ -86,19 +86,10 @@ export default function App() {
     );
   }
 
-  // Header hanya muncul saat user masih di Hero (belum scroll)
-  // Pakai wrapper dengan animasi fade & slide agar transisinya halus
   return (
     <div className="min-h-screen bg-bg">
-      <div
-        className={`transition-all duration-500 ${
-          showDock
-            ? 'opacity-0 -translate-y-4 pointer-events-none'
-            : 'opacity-100 translate-y-0'
-        }`}
-      >
-        <Header activeSection={activeSection} />
-      </div>
+      {/* Header: TIDAK dibungkus div lagi. Animasi ada di dalam Header.tsx */}
+      <Header activeSection={activeSection} visible={!showDock} />
 
       <main>
         <Hero content={content.hero} />
