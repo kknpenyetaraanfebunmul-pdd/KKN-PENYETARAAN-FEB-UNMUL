@@ -12,8 +12,38 @@ import AdminDashboard from './components/admin/AdminDashboard';
 
 const sections = ['home', 'struktur', 'program', 'gallery', 'contact'];
 
+// ============================================
+// KOMPONEN LOADING SCREEN
+// ============================================
+function LoadingScreen() {
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-dark-purple">
+      {/* Logo */}
+      <div className="mb-8">
+        <span className="text-4xl font-extrabold tracking-tight">
+          <span className="bg-gradient-to-r from-primary-purple to-purple-300 bg-clip-text text-transparent">
+            KKN
+          </span>
+          <span className="text-white">.</span>
+        </span>
+      </div>
+
+      {/* Spinner */}
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-4 border-primary-purple/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary-purple animate-spin" />
+      </div>
+
+      {/* Text */}
+      <p className="text-white/50 text-sm mt-6 tracking-widest uppercase">
+        Memuat...
+      </p>
+    </div>
+  );
+}
+
 export default function App() {
-  const { content, updateContent, resetContent } = useContent();
+  const { content, updateContent, resetContent, loading } = useContent();
   const [activeSection, setActiveSection] = useState('home');
   const [showDock, setShowDock] = useState(false);
   const [adminMode, setAdminMode] = useState(false);
@@ -27,7 +57,7 @@ export default function App() {
   }, [adminMode]);
 
   useEffect(() => {
-    if (adminMode) return;
+    if (adminMode || loading) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -45,9 +75,6 @@ export default function App() {
       if (el) observer.observe(el);
     });
 
-    // Logika:
-    // - showDock = true  -> user sudah scroll melewati Hero (Header hilang, DockNav muncul)
-    // - showDock = false -> user masih di Hero (Header muncul, DockNav hilang)
     const onScroll = () => {
       const hero = document.getElementById('home');
       if (hero) {
@@ -64,7 +91,7 @@ export default function App() {
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
     };
-  }, [adminMode]);
+  }, [adminMode, loading]);
 
   const handleAdminAccess = () => setAdminMode(true);
   const handleAdminExit = () => setAdminMode(false);
@@ -73,6 +100,14 @@ export default function App() {
     sessionStorage.removeItem(ADMIN_SESSION_KEY);
     setAdminMode(false);
   };
+
+  // ============================================
+  // LOADING STATE: Tampilkan loading screen
+  // sambil tunggu data dari Supabase
+  // ============================================
+  if (loading && !adminMode) {
+    return <LoadingScreen />;
+  }
 
   if (adminMode) {
     return (
@@ -88,7 +123,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Header: TIDAK dibungkus div lagi. Animasi ada di dalam Header.tsx */}
       <Header activeSection={activeSection} visible={!showDock} />
 
       <main>
