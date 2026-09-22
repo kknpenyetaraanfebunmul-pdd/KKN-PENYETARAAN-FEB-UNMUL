@@ -30,7 +30,7 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
         onClick={onClose}
       >
         <div
-          className="bg-bg rounded-3xl max-w-3xl w-full my-8 shadow-2xl animate-slide-up overflow-hidden"
+          className="bg-bg dark:bg-dark-card rounded-3xl max-w-3xl w-full my-8 shadow-2xl animate-slide-up overflow-hidden transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -52,7 +52,7 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
 
           {/* Daftar Anggota */}
           <div className="p-5 sm:p-8">
-            <p className="text-xs text-dark-purple/40 text-center mb-5">
+            <p className="text-xs text-dark-purple/40 dark:text-dark-text-muted text-center mb-5 transition-colors">
               Klik anggota untuk melihat detail
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -60,7 +60,7 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
                 <button
                   key={idx}
                   onClick={() => setSelectedMember(member)}
-                  className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-bubble-light shadow-sm hover:shadow-xl hover:border-primary-purple/40 hover:-translate-y-1 transition-all duration-300 text-left group"
+                  className="flex items-center gap-4 bg-white dark:bg-dark-bg rounded-2xl p-4 border border-bubble-light dark:border-dark-border shadow-sm hover:shadow-xl hover:border-primary-purple/40 hover:-translate-y-1 transition-all duration-300 text-left group"
                 >
                   {/* Foto/Avatar */}
                   <div className="w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden bg-primary-purple/10 flex items-center justify-center">
@@ -80,10 +80,10 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-dark-purple text-base truncate group-hover:text-primary-purple transition-colors">
+                    <h3 className="font-bold text-dark-purple dark:text-dark-text text-base truncate group-hover:text-primary-purple transition-colors">
                       {member.name || 'Belum ada nama'}
                     </h3>
-                    <p className="text-xs text-dark-purple/50 font-medium mt-1">
+                    <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium mt-1 transition-colors">
                       {member.nim ? `NIM: ${member.nim}` : 'NIM belum diisi'}
                     </p>
                   </div>
@@ -94,7 +94,6 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
         </div>
       </div>
 
-      {/* MODAL DETAIL ANGGOTA (muncul di atas StrukturModal) */}
       {selectedMember && (
         <MemberModal
           member={selectedMember}

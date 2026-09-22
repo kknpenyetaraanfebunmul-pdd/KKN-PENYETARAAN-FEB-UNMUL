@@ -26,7 +26,7 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-bg rounded-3xl max-w-md w-full shadow-2xl animate-slide-up overflow-hidden"
+        className="bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl animate-slide-up overflow-hidden transition-colors duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -47,8 +47,8 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
         </div>
 
         {/* Logo */}
-        <div className="p-8 flex items-center justify-center bg-white">
-          <div className="w-48 h-48 rounded-2xl bg-card-bg border border-bubble-light flex items-center justify-center p-6">
+        <div className="p-8 flex items-center justify-center bg-white dark:bg-dark-bg transition-colors duration-300">
+          <div className="w-48 h-48 rounded-2xl bg-card-bg dark:bg-dark-card border border-bubble-light dark:border-dark-border flex items-center justify-center p-6 transition-colors duration-300">
             <img
               src={partner.logo_url}
               alt={partner.nama}
@@ -59,8 +59,12 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
 
         {/* Info */}
         <div className="px-6 pb-6 text-center">
-          <p className="text-sm text-dark-purple/50">
-            Klik di luar area atau tekan <kbd className="px-2 py-0.5 bg-card-bg rounded text-xs font-mono">Esc</kbd> untuk menutup
+          <p className="text-sm text-dark-purple/50 dark:text-dark-text-muted transition-colors duration-300">
+            Klik di luar area atau tekan{' '}
+            <kbd className="px-2 py-0.5 bg-card-bg dark:bg-dark-bg rounded text-xs font-mono transition-colors duration-300">
+              Esc
+            </kbd>{' '}
+            untuk menutup
           </p>
         </div>
       </div>
