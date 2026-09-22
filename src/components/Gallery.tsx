@@ -11,7 +11,12 @@ export default function Gallery({ content }: GalleryProps) {
   const [isPaused, setIsPaused] = useState(false);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
+  const dragState = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasDragged: false,
+  });
 
   const closeLightbox = useCallback(() => setLightbox(null), []);
   const nextImage = useCallback(() => {
@@ -43,21 +48,23 @@ export default function Gallery({ content }: GalleryProps) {
   }, [lightbox, closeLightbox, nextImage, prevImage]);
 
   // ============================================================
-  // PAUSE / RESUME MARQUEE
+  // PAUSE / RESUME
   // ============================================================
   const pauseMarquee = useCallback(() => {
     setIsPaused(true);
-    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
   }, []);
 
-  const resumeMarqueeLater = useCallback((delay = 3000) => {
+  const resumeMarqueeLater = useCallback((delay = 2500) => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     resumeTimerRef.current = setTimeout(() => {
       setIsPaused(false);
     }, delay);
   }, []);
 
-  // Cleanup timer saat unmount
   useEffect(() => {
     return () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -65,12 +72,13 @@ export default function Gallery({ content }: GalleryProps) {
   }, []);
 
   // ============================================================
-  // DRAG TO SCROLL
+  // DRAG TO SCROLL (Mouse)
   // ============================================================
   const handleMouseDown = (e: React.MouseEvent) => {
     const el = scrollRef.current;
     if (!el) return;
     dragState.current.isDown = true;
+    dragState.current.hasDragged = false;
     dragState.current.startX = e.pageX - el.offsetLeft;
     dragState.current.scrollLeft = el.scrollLeft;
     pauseMarquee();
@@ -83,17 +91,46 @@ export default function Gallery({ content }: GalleryProps) {
     e.preventDefault();
     const x = e.pageX - el.offsetLeft;
     const walk = (x - dragState.current.startX) * 1.5;
+    
+    // Tandai sebagai "drag" kalau pergerakan lebih dari 5px
+    if (Math.abs(walk) > 5) {
+      dragState.current.hasDragged = true;
+    }
+    
     el.scrollLeft = dragState.current.scrollLeft - walk;
   };
 
   const handleMouseUp = () => {
+    if (!dragState.current.isDown) return;
     dragState.current.isDown = false;
     resumeMarqueeLater(2500);
   };
 
-  const handleMouseLeave = () => {
-    dragState.current.isDown = false;
-    resumeMarqueeLater(2500);
+  const handleMouseLeaveContainer = () => {
+    if (dragState.current.isDown) {
+      dragState.current.isDown = false;
+    }
+    // Resume saat keluar container (jika sebelumnya pause karena hover)
+    resumeMarqueeLater(1500);
+  };
+
+  // ============================================================
+  // WHEEL SCROLL (Scroll mouse)
+  // ============================================================
+  const handleWheel = (e: React.WheelEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    // Konversi scroll vertikal jadi horizontal
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    } else {
+      el.scrollLeft += e.deltaX;
+    }
+    
+    pauseMarquee();
+    resumeMarqueeLater(2000);
   };
 
   // ============================================================
@@ -133,27 +170,25 @@ export default function Gallery({ content }: GalleryProps) {
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
           <p className="text-xs text-dark-purple/40 mt-3">
-            Klik & geser untuk menjelajah, atau sentuh gambar untuk memperbesar
+            Scroll, drag, atau klik gambar untuk melihat detail
           </p>
         </div>
       </div>
 
       {/* CONTAINER MARQUEE */}
       <div className="relative w-full">
-        {/* Gradient fade kiri & kanan */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
 
         <div
           ref={scrollRef}
-          className="overflow-x-hidden w-full cursor-grab active:cursor-grabbing"
+          className="overflow-x-scroll w-full cursor-grab active:cursor-grabbing gallery-scroll"
           onMouseEnter={pauseMarquee}
-          onMouseLeave={handleMouseLeave}
+          onMouseLeave={handleMouseLeaveContainer}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onTouchStart={pauseMarquee}
-          onTouchEnd={() => resumeMarqueeLater(2000)}
+          onWheel={handleWheel}
         >
           <div
             className={`marquee-track flex gap-4 sm:gap-6 py-4 select-none ${
@@ -170,10 +205,12 @@ export default function Gallery({ content }: GalleryProps) {
                   key={`${item.id}-${idx}`}
                   className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
                   onClick={() => {
-                    // Hanya buka lightbox kalau bukan sedang drag
-                    if (!dragState.current.isDown) {
+                    // Cek kalau user drag, jangan buka lightbox
+                    if (!dragState.current.hasDragged) {
                       setLightbox(realIndex);
                     }
+                    // Reset flag
+                    dragState.current.hasDragged = false;
                   }}
                 >
                   {isVideo ? (
