@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import type { SiteContent } from '../types';
 
@@ -8,6 +8,10 @@ interface GalleryProps {
 
 export default function Gallery({ content }: GalleryProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
 
   const closeLightbox = useCallback(() => setLightbox(null), []);
   const nextImage = useCallback(() => {
@@ -39,28 +43,71 @@ export default function Gallery({ content }: GalleryProps) {
   }, [lightbox, closeLightbox, nextImage, prevImage]);
 
   // ============================================================
-  // LOGIKA INFINITY MARQUEE
-  // Pastikan konten cukup lebar agar tidak ada gap saat looping
+  // PAUSE / RESUME MARQUEE
+  // ============================================================
+  const pauseMarquee = useCallback(() => {
+    setIsPaused(true);
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  }, []);
+
+  const resumeMarqueeLater = useCallback((delay = 3000) => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, delay);
+  }, []);
+
+  // Cleanup timer saat unmount
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    };
+  }, []);
+
+  // ============================================================
+  // DRAG TO SCROLL
+  // ============================================================
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    dragState.current.isDown = true;
+    dragState.current.startX = e.pageX - el.offsetLeft;
+    dragState.current.scrollLeft = el.scrollLeft;
+    pauseMarquee();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragState.current.isDown) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - dragState.current.startX) * 1.5;
+    el.scrollLeft = dragState.current.scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    dragState.current.isDown = false;
+    resumeMarqueeLater(2500);
+  };
+
+  const handleMouseLeave = () => {
+    dragState.current.isDown = false;
+    resumeMarqueeLater(2500);
+  };
+
+  // ============================================================
+  // DATA PREPARATION
   // ============================================================
   const itemCount = Math.max(content.length, 1);
-  
-  // Minimal 12 item per "half" agar selalu lebih lebar dari layar
   const itemsPerHalf = 12;
   const repeatCount = Math.max(1, Math.ceil(itemsPerHalf / itemCount));
-  
-  // Half pertama: konten diulang sebanyak repeatCount
   const halfContent = Array(repeatCount).fill(content).flat();
-  
-  // Gabungkan 2 half yang identik (untuk animasi -50% yang seamless)
   const extendedContent = [...halfContent, ...halfContent];
-  
-  // Durasi animasi proporsional dengan jumlah item (biar kecepatan konsisten)
-  // ~4 detik per item, minimal 40 detik
   const animationDuration = Math.max(40, halfContent.length * 8);
 
   return (
     <section id="gallery" className="py-20 sm:py-28 overflow-hidden">
-      {/* KEYFRAMES ANIMASI MARQUEE */}
       <style>{`
         @keyframes marquee-scroll {
           0% { transform: translateX(0); }
@@ -71,7 +118,7 @@ export default function Gallery({ content }: GalleryProps) {
           width: max-content;
           will-change: transform;
         }
-        .marquee-track:hover {
+        .marquee-track.paused {
           animation-play-state: paused;
         }
       `}</style>
@@ -85,67 +132,90 @@ export default function Gallery({ content }: GalleryProps) {
             Gallery
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
+          <p className="text-xs text-dark-purple/40 mt-3">
+            Klik & geser untuk menjelajah, atau sentuh gambar untuk memperbesar
+          </p>
         </div>
       </div>
 
-      {/* CONTAINER MARQUEE (FULL WIDTH) */}
+      {/* CONTAINER MARQUEE */}
       <div className="relative w-full">
-        {/* Gradient fade di kiri & kanan agar transisi mulus */}
+        {/* Gradient fade kiri & kanan */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
 
         <div
-          className="marquee-track flex gap-4 sm:gap-6 py-4"
-          style={{ animationDuration: `${animationDuration}s` }}
+          ref={scrollRef}
+          className="overflow-x-hidden w-full cursor-grab active:cursor-grabbing"
+          onMouseEnter={pauseMarquee}
+          onMouseLeave={handleMouseLeave}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onTouchStart={pauseMarquee}
+          onTouchEnd={() => resumeMarqueeLater(2000)}
         >
-          {extendedContent.map((item, idx) => {
-            const realIndex = idx % content.length;
-            const isVideo = item.tipe === 'video';
+          <div
+            className={`marquee-track flex gap-4 sm:gap-6 py-4 select-none ${
+              isPaused ? 'paused' : ''
+            }`}
+            style={{ animationDuration: `${animationDuration}s` }}
+          >
+            {extendedContent.map((item, idx) => {
+              const realIndex = idx % content.length;
+              const isVideo = item.tipe === 'video';
 
-            return (
-              <div
-                key={`${item.id}-${idx}`}
-                className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
-                onClick={() => setLightbox(realIndex)}
-              >
-                {isVideo ? (
-                  <>
-                    <video
+              return (
+                <div
+                  key={`${item.id}-${idx}`}
+                  className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
+                  onClick={() => {
+                    // Hanya buka lightbox kalau bukan sedang drag
+                    if (!dragState.current.isDown) {
+                      setLightbox(realIndex);
+                    }
+                  }}
+                >
+                  {isVideo ? (
+                    <>
+                      <video
+                        src={item.url}
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                        className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-dark-purple/20 pointer-events-none">
+                        <Play size={48} className="text-white fill-white opacity-80" />
+                      </div>
+                    </>
+                  ) : (
+                    <img
                       src={item.url}
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110"
+                      alt={item.judul}
+                      loading="lazy"
+                      draggable={false}
+                      className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-dark-purple/20 pointer-events-none">
-                      <Play size={48} className="text-white fill-white opacity-80" />
-                    </div>
-                  </>
-                ) : (
-                  <img
-                    src={item.url}
-                    alt={item.judul}
-                    loading="lazy"
-                    className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                )}
+                  )}
 
-                {/* Overlay Judul & Deskripsi saat Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-purple/90 via-dark-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 pointer-events-none">
-                  <h3 className="text-white font-bold text-lg mb-1">
-                    {item.judul}
-                  </h3>
-                  <p className="text-white/70 text-sm line-clamp-2">
-                    {item.deskripsi}
-                  </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark-purple/90 via-dark-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 pointer-events-none">
+                    <h3 className="text-white font-bold text-lg mb-1">
+                      {item.judul}
+                    </h3>
+                    <p className="text-white/70 text-sm line-clamp-2">
+                      {item.deskripsi}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
+      {/* LIGHTBOX */}
       {lightbox !== null && content[lightbox] && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/95 backdrop-blur-md animate-fade-in p-4"
