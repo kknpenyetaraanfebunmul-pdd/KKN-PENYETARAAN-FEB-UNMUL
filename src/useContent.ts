@@ -8,14 +8,8 @@ export const ADMIN_SESSION_KEY = 'kkn-admin-session';
 export const ADMIN_PASSCODE = '110106';
 
 // ============================================
-// FUNGSI MIGRASI: Mengubah data lama ke format baru
+// FUNGSI MIGRASI
 // ============================================
-
-function isOldStrukturFormat(struktur: any[]): boolean {
-  if (!Array.isArray(struktur) || struktur.length === 0) return false;
-  const first = struktur[0];
-  return 'role' in first || 'description' in first;
-}
 
 function isOldMembersFormat(members: any[]): boolean {
   if (!Array.isArray(members) || members.length === 0) return false;
@@ -39,15 +33,11 @@ function migrateStruktur(struktur: any[]): any[] {
     if (Array.isArray(item.members)) {
       if (isOldMembersFormat(item.members)) {
         newMembers = item.members.map((name: string) => ({
-          name: name || '',
-          nim: '',
-          photo: '',
+          name: name || '', nim: '', photo: '',
         }));
       } else {
         newMembers = item.members.map((m: any) => ({
-          name: m?.name || '',
-          nim: m?.nim || '',
-          photo: m?.photo || '',
+          name: m?.name || '', nim: m?.nim || '', photo: m?.photo || '',
         }));
       }
     }
@@ -61,14 +51,13 @@ function migrateStruktur(struktur: any[]): any[] {
   });
 }
 
-// FUNGSI BARU: Migrasi Partner (Support & Sponsor)
 function migratePartners(partners: any[], grup: 'support' | 'sponsor'): PartnerRow[] {
   if (!Array.isArray(partners)) return [];
   return partners.map((p, idx) => ({
     id: p.id || `p_${idx}`,
     grup: p.grup || grup,
-    nama: p.nama || p.name || '', // Handle 'nama' atau 'name'
-    logo_url: p.logo_url || p.logo || '', // Handle 'logo_url' atau 'logo'
+    nama: p.nama || p.name || '',
+    logo_url: p.logo_url || p.logo || '',
     urutan: p.urutan || idx + 1,
   }));
 }
@@ -101,7 +90,7 @@ function sanitizeContent(content: Partial<SiteContent>): SiteContent {
 }
 
 // ============================================
-// CACHE MANAGEMENT
+// CACHE
 // ============================================
 
 function loadFromCache(): SiteContent | null {
@@ -119,7 +108,7 @@ function cacheContent(content: SiteContent) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
   } catch {
-    // ignore write errors
+    // ignore
   }
 }
 
@@ -133,7 +122,11 @@ export function useContent() {
     return loadFromCache() ?? defaultContent;
   });
   const [loading, setLoading] = useState(true);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
+  // ============================================
+  // LOAD: Supabase adalah SUMBER KEBENARAN
+  // ============================================
   useEffect(() => {
     let cancelled = false;
 
@@ -149,17 +142,27 @@ export function useContent() {
 
         if (error) {
           console.error('Failed to load content from Supabase:', error);
+          setSyncError(`Gagal load dari server: ${error.message}`);
           setLoading(false);
           return;
         }
 
+        // Kalau Supabase ADA datanya, pakai itu (ini yang benar)
         if (data?.content) {
           const sanitized = sanitizeContent(data.content as Partial<SiteContent>);
           setContent(sanitized);
           cacheContent(sanitized);
+        } 
+        // Kalau Supabase KOSONG, upload data default ke sana (auto-create row)
+        else {
+          console.warn('Supabase row kosong, auto-create dengan default content');
+          await supabase
+            .from('site_content')
+            .upsert({ id: 1, content: defaultContent });
         }
       } catch (err) {
         console.error('Failed to load content:', err);
+        setSyncError('Gagal terhubung ke server');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -170,41 +173,78 @@ export function useContent() {
     };
   }, []);
 
-  const updateContent = useCallback((updater: (prev: SiteContent) => SiteContent) => {
+  // ============================================
+  // UPDATE: Pakai upsert agar tidak gagal saat row tidak ada
+  // ============================================
+  const updateContent = useCallback(async (updater: (prev: SiteContent) => SiteContent) => {
+    let nextContent: SiteContent | null = null;
+
     setContent((prev) => {
-      const next = updater(prev);
-      cacheContent(next);
-
-      supabase
-        .from('site_content')
-        .update({ content: next })
-        .eq('id', 1)
-        .then(({ error }) => {
-          if (error) console.error('Failed to save content to Supabase:', error);
-        });
-
-      return next;
+      nextContent = updater(prev);
+      cacheContent(nextContent);
+      return nextContent;
     });
+
+    // Kirim ke Supabase pakai upsert (insert if not exist, update if exists)
+    if (nextContent) {
+      const { error } = await supabase
+        .from('site_content')
+        .upsert({ id: 1, content: nextContent }, { onConflict: 'id' });
+
+      if (error) {
+        console.error('❌ Gagal simpan ke Supabase:', error);
+        setSyncError(`Gagal simpan: ${error.message}`);
+        alert(`⚠️ GAGAL SIMPAN KE SERVER!\n\n${error.message}\n\nPerubahan hanya tersimpan di browser ini. Coba lagi atau hubungi admin.`);
+      } else {
+        setSyncError(null);
+      }
+    }
   }, []);
 
-  const resetContent = useCallback(() => {
-    setContent((prev) => {
-      const next = defaultContent;
-      cacheContent(next);
+  const resetContent = useCallback(async () => {
+    setContent(defaultContent);
+    cacheContent(defaultContent);
 
-      supabase
-        .from('site_content')
-        .update({ content: next })
-        .eq('id', 1)
-        .then(({ error }) => {
-          if (error) console.error('Failed to reset content in Supabase:', error);
-        });
+    const { error } = await supabase
+      .from('site_content')
+      .upsert({ id: 1, content: defaultContent }, { onConflict: 'id' });
 
-      return next;
-    });
+    if (error) {
+      console.error('❌ Gagal reset di Supabase:', error);
+      setSyncError(`Gagal reset: ${error.message}`);
+      alert(`⚠️ GAGAL RESET DI SERVER!\n\n${error.message}`);
+    } else {
+      setSyncError(null);
+    }
   }, []);
 
-  return { content, updateContent, resetContent, loading };
+  // Fungsi manual untuk force sync dari localStorage ke Supabase
+  const forceSyncToServer = useCallback(async () => {
+    const cached = loadFromCache();
+    if (!cached) {
+      alert('Tidak ada data di cache browser.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('site_content')
+      .upsert({ id: 1, content: cached }, { onConflict: 'id' });
+
+    if (error) {
+      alert(`Gagal force sync: ${error.message}`);
+    } else {
+      alert('✅ Berhasil sync data lokal ke server!');
+    }
+  }, []);
+
+  return { 
+    content, 
+    updateContent, 
+    resetContent, 
+    loading,
+    syncError,
+    forceSyncToServer,
+  };
 }
 
 // ============================================
