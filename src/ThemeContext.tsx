@@ -17,7 +17,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window === 'undefined') return 'light';
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
     if (stored) return stored;
-    // Auto-detect preferensi OS
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
