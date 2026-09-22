@@ -1,4 +1,5 @@
-import { Home, Users, Briefcase, Images, Mail } from 'lucide-react';
+import { Home, Users, Briefcase, Images, Mail, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../ThemeContext';
 
 const dockItems = [
   { id: 'home', label: 'Home', icon: Home },
@@ -14,6 +15,8 @@ interface DockNavProps {
 }
 
 export default function DockNav({ activeSection, visible }: DockNavProps) {
+  const { isDark, toggleTheme } = useTheme();
+
   const handleNav = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -32,7 +35,7 @@ export default function DockNav({ activeSection, visible }: DockNavProps) {
             : 'opacity-0 translate-y-20 pointer-events-none'
         }`}
       >
-        <div className="flex items-center gap-1 bg-dark-purple/90 backdrop-blur-xl rounded-full px-3 py-2 shadow-2xl border border-white/10">
+        <div className="flex items-center gap-1 bg-dark-purple/90 dark:bg-dark-card/95 backdrop-blur-xl rounded-full px-3 py-2 shadow-2xl border border-white/10 dark:border-dark-border">
           {dockItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -56,10 +59,22 @@ export default function DockNav({ activeSection, visible }: DockNavProps) {
               </button>
             );
           })}
+
+          {/* Divider */}
+          <div className="w-px h-8 bg-white/15 mx-1" />
+
+          {/* Toggle Theme */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-10 h-10 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300"
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
         </div>
       </div>
 
-      {/* DESKTOP: Dock di kanan, vertikal, lebih besar */}
+      {/* DESKTOP: Dock di kanan, vertikal */}
       <div
         className={`hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 transition-all duration-500 ${
           visible
@@ -67,7 +82,7 @@ export default function DockNav({ activeSection, visible }: DockNavProps) {
             : 'opacity-0 translate-x-24 pointer-events-none'
         }`}
       >
-        <div className="flex flex-col items-center gap-2 bg-dark-purple/90 backdrop-blur-xl rounded-3xl px-3 py-4 shadow-2xl border border-white/10">
+        <div className="flex flex-col items-center gap-2 bg-dark-purple/90 dark:bg-dark-card/95 backdrop-blur-xl rounded-3xl px-3 py-4 shadow-2xl border border-white/10 dark:border-dark-border">
           {dockItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -89,6 +104,21 @@ export default function DockNav({ activeSection, visible }: DockNavProps) {
               </button>
             );
           })}
+
+          {/* Divider */}
+          <div className="w-8 h-px bg-white/15 my-1" />
+
+          {/* Toggle Theme */}
+          <button
+            onClick={toggleTheme}
+            className="group relative flex items-center justify-center w-14 h-14 rounded-2xl text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300"
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun size={22} /> : <Moon size={22} />}
+            <span className="absolute right-full mr-4 bg-dark-purple text-white text-sm font-semibold px-4 py-2 rounded-xl whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
+              {isDark ? 'Mode Terang' : 'Mode Gelap'}
+            </span>
+          </button>
         </div>
       </div>
     </>
