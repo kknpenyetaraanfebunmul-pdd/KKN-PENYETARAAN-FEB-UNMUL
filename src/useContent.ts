@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SiteContent, StrukturMember, PartnerRow } from './types';
+import type { SiteContent, StrukturMember, PartnerRow, ProgramRow } from './types';
 import { defaultContent } from './defaultContent';
 import { supabase } from './lib/supabase';
 
@@ -18,7 +18,7 @@ function isOldMembersFormat(members: any[]): boolean {
 
 function migrateStruktur(struktur: any[]): any[] {
   if (!Array.isArray(struktur)) return defaultContent.struktur;
-  
+
   return struktur.map((item, idx) => {
     if ('role' in item) {
       return {
@@ -28,7 +28,7 @@ function migrateStruktur(struktur: any[]): any[] {
         urutan: item.urutan || idx + 1,
       };
     }
-    
+
     let newMembers: StrukturMember[] = [];
     if (Array.isArray(item.members)) {
       if (isOldMembersFormat(item.members)) {
@@ -41,7 +41,7 @@ function migrateStruktur(struktur: any[]): any[] {
         }));
       }
     }
-    
+
     return {
       id: item.id || `st_${idx}`,
       jabatan: item.jabatan || '',
@@ -49,6 +49,30 @@ function migrateStruktur(struktur: any[]): any[] {
       urutan: item.urutan || idx + 1,
     };
   });
+}
+
+// === MIGRASI PROGRAM (BARU) ===
+function migratePrograms(programs: any[]): ProgramRow[] {
+  if (!Array.isArray(programs)) return defaultContent.programs;
+
+  return programs.map((p, idx) => ({
+    id: p.id || `p_${idx}`,
+    key: p.key || `program_${idx}`,
+    icon: p.icon || '📌',
+    judul: p.judul || p.title || '',
+    subjudul: p.subjudul || p.shortDesc || '',
+    deskripsi_lengkap: p.deskripsi_lengkap || p.fullDesc || '',
+    kegiatan: Array.isArray(p.kegiatan) ? p.kegiatan : (Array.isArray(p.activities) ? p.activities : []),
+    info: p.info && typeof p.info === 'object'
+      ? {
+          sasaran: p.info.sasaran || '',
+          jadwal: p.info.jadwal || '',
+          lokasi: p.info.lokasi || '',
+          target: p.info.target || '',
+        }
+      : { sasaran: '', jadwal: '', lokasi: '', target: '' },
+    urutan: p.urutan || idx + 1,
+  }));
 }
 
 function migratePartners(partners: any[], grup: 'support' | 'sponsor'): PartnerRow[] {
@@ -63,9 +87,13 @@ function migratePartners(partners: any[], grup: 'support' | 'sponsor'): PartnerR
 }
 
 function sanitizeContent(content: Partial<SiteContent>): SiteContent {
-  const struktur = content.struktur 
+  const struktur = content.struktur
     ? migrateStruktur(content.struktur as any[])
     : defaultContent.struktur;
+
+  const programs = content.programs
+    ? migratePrograms(content.programs as any[])
+    : defaultContent.programs;
 
   const supportBy = content.supportBy
     ? migratePartners(content.supportBy as any[], 'support')
@@ -81,9 +109,9 @@ function sanitizeContent(content: Partial<SiteContent>): SiteContent {
     hero: { ...defaultContent.hero, ...content.hero },
     footer: { ...defaultContent.footer, ...content.footer },
     struktur,
+    programs,
     supportBy,
     sponsorBy,
-    programs: content.programs || defaultContent.programs,
     gallery: content.gallery || defaultContent.gallery,
     contacts: content.contacts || defaultContent.contacts,
   } as SiteContent;
@@ -124,9 +152,6 @@ export function useContent() {
   const [loading, setLoading] = useState(true);
   const [syncError, setSyncError] = useState<string | null>(null);
 
-  // ============================================
-  // LOAD: Supabase adalah SUMBER KEBENARAN
-  // ============================================
   useEffect(() => {
     let cancelled = false;
 
@@ -147,14 +172,11 @@ export function useContent() {
           return;
         }
 
-        // Kalau Supabase ADA datanya, pakai itu (ini yang benar)
         if (data?.content) {
           const sanitized = sanitizeContent(data.content as Partial<SiteContent>);
           setContent(sanitized);
           cacheContent(sanitized);
-        } 
-        // Kalau Supabase KOSONG, upload data default ke sana (auto-create row)
-        else {
+        } else {
           console.warn('Supabase row kosong, auto-create dengan default content');
           await supabase
             .from('site_content')
@@ -173,9 +195,6 @@ export function useContent() {
     };
   }, []);
 
-  // ============================================
-  // UPDATE: Pakai upsert agar tidak gagal saat row tidak ada
-  // ============================================
   const updateContent = useCallback(async (updater: (prev: SiteContent) => SiteContent) => {
     let nextContent: SiteContent | null = null;
 
@@ -185,7 +204,6 @@ export function useContent() {
       return nextContent;
     });
 
-    // Kirim ke Supabase pakai upsert (insert if not exist, update if exists)
     if (nextContent) {
       const { error } = await supabase
         .from('site_content')
@@ -194,7 +212,7 @@ export function useContent() {
       if (error) {
         console.error('❌ Gagal simpan ke Supabase:', error);
         setSyncError(`Gagal simpan: ${error.message}`);
-        alert(`⚠️ GAGAL SIMPAN KE SERVER!\n\n${error.message}\n\nPerubahan hanya tersimpan di browser ini. Coba lagi atau hubungi admin.`);
+        alert(`⚠️ GAGAL SIMPAN KE SERVER!\n\n${error.message}`);
       } else {
         setSyncError(null);
       }
@@ -218,7 +236,6 @@ export function useContent() {
     }
   }, []);
 
-  // Fungsi manual untuk force sync dari localStorage ke Supabase
   const forceSyncToServer = useCallback(async () => {
     const cached = loadFromCache();
     if (!cached) {
@@ -237,10 +254,10 @@ export function useContent() {
     }
   }, []);
 
-  return { 
-    content, 
-    updateContent, 
-    resetContent, 
+  return {
+    content,
+    updateContent,
+    resetContent,
     loading,
     syncError,
     forceSyncToServer,

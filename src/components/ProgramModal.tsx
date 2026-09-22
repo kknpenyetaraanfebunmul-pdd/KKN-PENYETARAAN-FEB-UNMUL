@@ -1,18 +1,31 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { X, Target, Calendar, MapPin, Users } from 'lucide-react';
-import type { ProgramItem } from '../types';
+import type { ProgramRow } from '../types';
 
 interface ProgramModalProps {
-  program: ProgramItem;
+  program: ProgramRow;
   onClose: () => void;
 }
 
 export default function ProgramModal({ program, onClose }: ProgramModalProps) {
+  // Handle Escape key untuk close
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    document.body.classList.add('modal-open');
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.body.classList.remove('modal-open');
+    };
+  }, [onClose]);
+
   const infoItems = [
-    { icon: Target, label: 'Sasaran', value: program.info.sasaran },
-    { icon: Calendar, label: 'Jadwal', value: program.info.jadwal },
-    { icon: MapPin, label: 'Lokasi', value: program.info.lokasi },
-    { icon: Users, label: 'Peserta/Target/Layanan', value: program.info.target },
+    { icon: Target, label: 'Sasaran', value: program.info?.sasaran || '-' },
+    { icon: Calendar, label: 'Jadwal', value: program.info?.jadwal || '-' },
+    { icon: MapPin, label: 'Lokasi', value: program.info?.lokasi || '-' },
+    { icon: Users, label: 'Peserta/Target/Layanan', value: program.info?.target || '-' },
   ];
 
   return (
@@ -21,13 +34,16 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-bg rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up"
+        className="bg-bg dark:bg-dark-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-gradient-to-r from-primary-purple to-dark-purple px-6 sm:px-8 py-6 flex items-start justify-between rounded-t-3xl">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-primary-purple to-dark-purple px-6 sm:px-8 py-6 flex items-start justify-between rounded-t-3xl z-10">
           <div className="flex items-center gap-3">
             <span className="text-4xl">{program.icon}</span>
-            <h3 className="text-2xl font-extrabold text-white">{program.title}</h3>
+            <h3 className="text-2xl font-extrabold text-white">
+              {program.judul}
+            </h3>
           </div>
           <button
             onClick={onClose}
@@ -39,31 +55,34 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
         </div>
 
         <div className="p-6 sm:p-8">
-          <p className="text-dark-purple/80 leading-relaxed mb-8">
-            {program.fullDesc}
+          {/* Deskripsi Lengkap */}
+          <p className="text-dark-purple/80 dark:text-dark-text-muted leading-relaxed mb-8 transition-colors">
+            {program.deskripsi_lengkap}
           </p>
 
-          <h4 className="text-lg font-bold text-dark-purple mb-4 flex items-center gap-2">
+          {/* Kegiatan */}
+          <h4 className="text-lg font-bold text-dark-purple dark:text-dark-text mb-4 flex items-center gap-2 transition-colors">
             <span className="w-1.5 h-6 bg-primary-purple rounded-full" />
             Kegiatan Utama
           </h4>
           <ol className="space-y-3 mb-8">
-            {program.activities.map((activity, idx) => (
+            {(program.kegiatan || []).map((activity, idx) => (
               <li
                 key={idx}
-                className="flex items-start gap-3 bg-card-bg rounded-xl p-3"
+                className="flex items-start gap-3 bg-card-bg dark:bg-dark-bg rounded-xl p-3 transition-colors"
               >
                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-purple text-white text-sm font-bold flex items-center justify-center">
                   {idx + 1}
                 </span>
-                <span className="text-sm text-dark-purple/80 pt-0.5">
+                <span className="text-sm text-dark-purple/80 dark:text-dark-text-muted pt-0.5 transition-colors">
                   {activity}
                 </span>
               </li>
             ))}
           </ol>
 
-          <h4 className="text-lg font-bold text-dark-purple mb-4 flex items-center gap-2">
+          {/* Info Program */}
+          <h4 className="text-lg font-bold text-dark-purple dark:text-dark-text mb-4 flex items-center gap-2 transition-colors">
             <span className="w-1.5 h-6 bg-primary-purple rounded-full" />
             Informasi Program
           </h4>
@@ -73,7 +92,7 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
               return (
                 <div
                   key={info.label}
-                  className="bg-card-bg rounded-2xl p-4 border border-bubble-light"
+                  className="bg-card-bg dark:bg-dark-bg rounded-2xl p-4 border border-bubble-light dark:border-dark-border transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Icon size={18} className="text-primary-purple" />
@@ -81,7 +100,9 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
                       {info.label}
                     </span>
                   </div>
-                  <p className="text-sm text-dark-purple/80">{info.value}</p>
+                  <p className="text-sm text-dark-purple/80 dark:text-dark-text-muted transition-colors">
+                    {info.value}
+                  </p>
                 </div>
               );
             })}
