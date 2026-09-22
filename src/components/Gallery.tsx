@@ -72,7 +72,37 @@ export default function Gallery({ content }: GalleryProps) {
   }, []);
 
   // ============================================================
-  // DRAG TO SCROLL (Mouse)
+  // WHEEL SCROLL — pakai native event listener + passive: false
+  // supaya bisa preventDefault (biar halaman tidak ikut scroll)
+  // ============================================================
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleWheelNative = (e: WheelEvent) => {
+      // Kalau user scroll pakai touchpad/mouse, kita block default
+      // supaya halaman tidak ikut scroll, tapi gallery yang geser
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      
+      // Cek kalau masih bisa scroll
+      const canScrollLeft = el.scrollLeft > 0;
+      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth;
+      
+      // Kalau masih bisa geser, cegah halaman scroll
+      if ((delta < 0 && canScrollLeft) || (delta > 0 && canScrollRight)) {
+        e.preventDefault();
+        el.scrollLeft += delta;
+        pauseMarquee();
+        resumeMarqueeLater(2000);
+      }
+    };
+
+    el.addEventListener('wheel', handleWheelNative, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheelNative);
+  }, [pauseMarquee, resumeMarqueeLater]);
+
+  // ============================================================
+  // DRAG TO SCROLL
   // ============================================================
   const handleMouseDown = (e: React.MouseEvent) => {
     const el = scrollRef.current;
@@ -92,7 +122,6 @@ export default function Gallery({ content }: GalleryProps) {
     const x = e.pageX - el.offsetLeft;
     const walk = (x - dragState.current.startX) * 1.5;
     
-    // Tandai sebagai "drag" kalau pergerakan lebih dari 5px
     if (Math.abs(walk) > 5) {
       dragState.current.hasDragged = true;
     }
@@ -106,31 +135,19 @@ export default function Gallery({ content }: GalleryProps) {
     resumeMarqueeLater(2500);
   };
 
-  const handleMouseLeaveContainer = () => {
+  // ============================================================
+  // RESUME SAAT KELUAR CONTAINER
+  // ============================================================
+  const handleMouseEnter = () => {
+    pauseMarquee();
+  };
+
+  const handleMouseLeave = () => {
     if (dragState.current.isDown) {
       dragState.current.isDown = false;
     }
-    // Resume saat keluar container (jika sebelumnya pause karena hover)
+    // Resume setelah keluar dari gallery
     resumeMarqueeLater(1500);
-  };
-
-  // ============================================================
-  // WHEEL SCROLL (Scroll mouse)
-  // ============================================================
-  const handleWheel = (e: React.WheelEvent) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    
-    // Konversi scroll vertikal jadi horizontal
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      el.scrollLeft += e.deltaY;
-      e.preventDefault();
-    } else {
-      el.scrollLeft += e.deltaX;
-    }
-    
-    pauseMarquee();
-    resumeMarqueeLater(2000);
   };
 
   // ============================================================
@@ -145,6 +162,7 @@ export default function Gallery({ content }: GalleryProps) {
 
   return (
     <section id="gallery" className="py-20 sm:py-28 overflow-hidden">
+      {/* CSS GLOBAL: sembunyikan scrollbar & keyframes */}
       <style>{`
         @keyframes marquee-scroll {
           0% { transform: translateX(0); }
@@ -157,6 +175,14 @@ export default function Gallery({ content }: GalleryProps) {
         }
         .marquee-track.paused {
           animation-play-state: paused;
+        }
+        /* Sembunyikan scrollbar */
+        .gallery-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+        .gallery-scroll-container {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
 
@@ -182,13 +208,12 @@ export default function Gallery({ content }: GalleryProps) {
 
         <div
           ref={scrollRef}
-          className="overflow-x-scroll w-full cursor-grab active:cursor-grabbing gallery-scroll"
-          onMouseEnter={pauseMarquee}
-          onMouseLeave={handleMouseLeaveContainer}
+          className="gallery-scroll-container overflow-x-scroll w-full cursor-grab active:cursor-grabbing"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          onWheel={handleWheel}
         >
           <div
             className={`marquee-track flex gap-4 sm:gap-6 py-4 select-none ${
@@ -205,11 +230,9 @@ export default function Gallery({ content }: GalleryProps) {
                   key={`${item.id}-${idx}`}
                   className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
                   onClick={() => {
-                    // Cek kalau user drag, jangan buka lightbox
                     if (!dragState.current.hasDragged) {
                       setLightbox(realIndex);
                     }
-                    // Reset flag
                     dragState.current.hasDragged = false;
                   }}
                 >
