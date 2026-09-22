@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useContent, ADMIN_SESSION_KEY } from './useContent';
+import { ThemeProvider } from './ThemeContext';
 import Header from './components/Header';
 import DockNav from './components/DockNav';
 import Hero from './components/Hero';
@@ -18,7 +19,6 @@ const sections = ['home', 'struktur', 'program', 'gallery', 'contact'];
 function LoadingScreen() {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-dark-purple">
-      {/* Logo */}
       <div className="mb-8">
         <span className="text-4xl font-extrabold tracking-tight">
           <span className="bg-gradient-to-r from-primary-purple to-purple-300 bg-clip-text text-transparent">
@@ -28,13 +28,11 @@ function LoadingScreen() {
         </span>
       </div>
 
-      {/* Spinner */}
       <div className="relative w-16 h-16">
         <div className="absolute inset-0 rounded-full border-4 border-primary-purple/20" />
         <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary-purple animate-spin" />
       </div>
 
-      {/* Text */}
       <p className="text-white/50 text-sm mt-6 tracking-widest uppercase">
         Memuat...
       </p>
@@ -42,7 +40,10 @@ function LoadingScreen() {
   );
 }
 
-export default function App() {
+// ============================================
+// MAIN APP (dipisah agar bisa dibungkus ThemeProvider)
+// ============================================
+function MainApp() {
   const { content, updateContent, resetContent, loading } = useContent();
   const [activeSection, setActiveSection] = useState('home');
   const [showDock, setShowDock] = useState(false);
@@ -102,8 +103,7 @@ export default function App() {
   };
 
   // ============================================
-  // LOADING STATE: Tampilkan loading screen
-  // sambil tunggu data dari Supabase
+  // LOADING STATE
   // ============================================
   if (loading && !adminMode) {
     return <LoadingScreen />;
@@ -122,7 +122,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg dark:bg-dark-bg transition-colors duration-300">
       <Header activeSection={activeSection} visible={!showDock} />
 
       <main>
@@ -139,5 +139,16 @@ export default function App() {
       <Footer content={content.footer} onAdminAccess={handleAdminAccess} />
       <DockNav activeSection={activeSection} visible={showDock} />
     </div>
+  );
+}
+
+// ============================================
+// APP WRAPPER
+// ============================================
+export default function App() {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
   );
 }

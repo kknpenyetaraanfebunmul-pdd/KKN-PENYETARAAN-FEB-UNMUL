@@ -11,7 +11,10 @@ export default function Program({ content }: ProgramProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
-    <section id="program" className="py-20 sm:py-28 px-5 sm:px-8 bg-dark-purple relative overflow-hidden">
+    <section
+      id="program"
+      className="py-20 sm:py-28 px-5 sm:px-8 bg-dark-purple dark:bg-[#1a0e2e] relative overflow-hidden transition-colors duration-300"
+    >
       {/* Background Ornaments */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-primary-purple/20 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary-purple/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
@@ -53,12 +56,12 @@ export default function Program({ content }: ProgramProps) {
                     className="text-white/30 transition-all duration-300 group-hover:text-primary-purple group-hover:rotate-45 group-hover:scale-110"
                   />
                 </div>
-                
+
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-primary-purple transition-colors duration-300">
-                  {program.title}
+                  {program.judul}
                 </h3>
                 <p className="text-sm sm:text-base text-white/60 leading-relaxed group-hover:text-white/80 transition-colors duration-300">
-                  {program.shortDesc}
+                  {program.subjudul}
                 </p>
               </div>
             </button>

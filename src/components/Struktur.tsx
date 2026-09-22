@@ -20,18 +20,21 @@ export default function Struktur({ content }: StrukturProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   return (
-    <section id="struktur" className="py-20 sm:py-28 px-5 sm:px-8 relative bg-white">
+    <section
+      id="struktur"
+      className="py-20 sm:py-28 px-5 sm:px-8 relative bg-white dark:bg-dark-bg transition-colors duration-300"
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
           <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
             Tim Kami
           </p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors">
             Struktur KKN
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
-          <p className="text-sm text-dark-purple/50 mt-4">
+          <p className="text-sm text-dark-purple/50 dark:text-dark-text-muted mt-4 transition-colors">
             Klik salah satu kartu untuk melihat detail anggota
           </p>
         </div>
@@ -44,7 +47,7 @@ export default function Struktur({ content }: StrukturProps) {
               <button
                 key={item.id}
                 onClick={() => setSelectedIndex(idx)}
-                className="group relative bg-white rounded-3xl p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-bubble-light overflow-hidden flex flex-col h-full cursor-pointer text-left"
+                className="group relative bg-white dark:bg-dark-card rounded-3xl p-8 text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-bubble-light dark:border-dark-border overflow-hidden flex flex-col h-full cursor-pointer text-left"
                 style={{
                   animation: `fadeIn 0.5s ease ${idx * 0.1}s both`,
                 }}
@@ -54,7 +57,7 @@ export default function Struktur({ content }: StrukturProps) {
 
                 <div className="relative z-10 flex flex-col items-center flex-grow">
                   {/* Avatar / Icon Container */}
-                  <div className="w-24 h-24 rounded-full bg-primary-purple/10 mb-5 flex items-center justify-center ring-4 ring-white shadow-sm transition-all duration-300 group-hover:bg-primary-purple group-hover:scale-110 group-hover:ring-primary-purple/20">
+                  <div className="w-24 h-24 rounded-full bg-primary-purple/10 mb-5 flex items-center justify-center ring-4 ring-white dark:ring-dark-bg shadow-sm transition-all duration-300 group-hover:bg-primary-purple group-hover:scale-110 group-hover:ring-primary-purple/20">
                     <Icon
                       size={36}
                       className="text-primary-purple transition-colors duration-300 group-hover:text-white"
@@ -62,7 +65,7 @@ export default function Struktur({ content }: StrukturProps) {
                   </div>
 
                   {/* Teks Jabatan */}
-                  <h3 className="text-xl font-bold text-dark-purple mb-4">
+                  <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-4 transition-colors">
                     {item.jabatan}
                   </h3>
 
@@ -71,7 +74,7 @@ export default function Struktur({ content }: StrukturProps) {
                     {(item.members || []).map((member, i) => (
                       <li
                         key={i}
-                        className="text-sm text-dark-purple/70 font-medium leading-relaxed"
+                        className="text-sm text-dark-purple/70 dark:text-dark-text-muted font-medium leading-relaxed transition-colors"
                       >
                         {member.name}
                       </li>
@@ -89,7 +92,7 @@ export default function Struktur({ content }: StrukturProps) {
         </div>
       </div>
 
-      {/* MODAL: Muncul saat kartu diklik */}
+      {/* MODAL */}
       {selectedIndex !== null && content[selectedIndex] && (
         <StrukturModal
           data={content[selectedIndex]}

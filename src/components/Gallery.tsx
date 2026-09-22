@@ -72,23 +72,18 @@ export default function Gallery({ content }: GalleryProps) {
   }, []);
 
   // ============================================================
-  // WHEEL SCROLL — pakai native event listener + passive: false
-  // supaya bisa preventDefault (biar halaman tidak ikut scroll)
+  // WHEEL SCROLL
   // ============================================================
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
     const handleWheelNative = (e: WheelEvent) => {
-      // Kalau user scroll pakai touchpad/mouse, kita block default
-      // supaya halaman tidak ikut scroll, tapi gallery yang geser
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       
-      // Cek kalau masih bisa scroll
       const canScrollLeft = el.scrollLeft > 0;
       const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth;
       
-      // Kalau masih bisa geser, cegah halaman scroll
       if ((delta < 0 && canScrollLeft) || (delta > 0 && canScrollRight)) {
         e.preventDefault();
         el.scrollLeft += delta;
@@ -135,9 +130,6 @@ export default function Gallery({ content }: GalleryProps) {
     resumeMarqueeLater(2500);
   };
 
-  // ============================================================
-  // RESUME SAAT KELUAR CONTAINER
-  // ============================================================
   const handleMouseEnter = () => {
     pauseMarquee();
   };
@@ -146,7 +138,6 @@ export default function Gallery({ content }: GalleryProps) {
     if (dragState.current.isDown) {
       dragState.current.isDown = false;
     }
-    // Resume setelah keluar dari gallery
     resumeMarqueeLater(1500);
   };
 
@@ -161,8 +152,10 @@ export default function Gallery({ content }: GalleryProps) {
   const animationDuration = Math.max(40, halfContent.length * 8);
 
   return (
-    <section id="gallery" className="py-20 sm:py-28 overflow-hidden">
-      {/* CSS GLOBAL: sembunyikan scrollbar & keyframes */}
+    <section
+      id="gallery"
+      className="py-20 sm:py-28 overflow-hidden bg-bg dark:bg-dark-bg transition-colors duration-300"
+    >
       <style>{`
         @keyframes marquee-scroll {
           0% { transform: translateX(0); }
@@ -176,7 +169,6 @@ export default function Gallery({ content }: GalleryProps) {
         .marquee-track.paused {
           animation-play-state: paused;
         }
-        /* Sembunyikan scrollbar */
         .gallery-scroll-container::-webkit-scrollbar {
           display: none;
         }
@@ -191,11 +183,11 @@ export default function Gallery({ content }: GalleryProps) {
           <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
             Dokumentasi
           </p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors">
             Gallery
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
-          <p className="text-xs text-dark-purple/40 mt-3">
+          <p className="text-xs text-dark-purple/40 dark:text-dark-text-muted mt-3 transition-colors">
             Scroll, drag, atau klik gambar untuk melihat detail
           </p>
         </div>
@@ -203,8 +195,9 @@ export default function Gallery({ content }: GalleryProps) {
 
       {/* CONTAINER MARQUEE */}
       <div className="relative w-full">
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+        {/* Gradient fade kiri — warnanya menyesuaikan theme */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-bg dark:from-dark-bg to-transparent z-10 pointer-events-none transition-colors duration-300" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-bg dark:from-dark-bg to-transparent z-10 pointer-events-none transition-colors duration-300" />
 
         <div
           ref={scrollRef}
@@ -228,7 +221,7 @@ export default function Gallery({ content }: GalleryProps) {
               return (
                 <div
                   key={`${item.id}-${idx}`}
-                  className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg"
+                  className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg dark:bg-dark-card"
                   onClick={() => {
                     if (!dragState.current.hasDragged) {
                       setLightbox(realIndex);

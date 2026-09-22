@@ -1,46 +1,54 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  theme: {
-    extend: {
-      colors: {
-        bg: '#f7f5fb',
-        'primary-purple': '#7b5ea7',
-        'dark-purple': '#2b1c3d',
-        'card-bg': '#ece6f5',
-        'bubble-light': 'rgba(123, 94, 167, 0.12)',
-      },
-      fontFamily: {
-        main: ['Poppins', 'sans-serif'],
-      },
-      animation: {
-        'slide-carousel': 'slideCarousel 12s infinite',
-        'fade-in': 'fadeIn 0.6s ease forwards',
-        'slide-up': 'slideUp 0.5s ease forwards',
-        heartbeat: 'heartbeat 1.5s ease-in-out infinite',
-      },
-      keyframes: {
-        slideCarousel: {
-          '0%': { transform: 'translateX(100%)', opacity: '0' },
-          '8.33%': { transform: 'translateX(0)', opacity: '1' },
-          '33.33%': { transform: 'translateX(0)', opacity: '1' },
-          '41.66%': { transform: 'translateX(-100%)', opacity: '0' },
-          '100%': { transform: 'translateX(-100%)', opacity: '0' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        heartbeat: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.15)' },
-        },
-      },
-    },
-  },
-  plugins: [],
-};
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+
+type Theme = 'light' | 'dark';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+  isDark: boolean;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+const THEME_STORAGE_KEY = 'kkn-theme';
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'light';
+    const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
+    if (stored) return stored;
+    // Auto-detect preferensi OS
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, isDark: theme === 'dark' }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context;
+}
