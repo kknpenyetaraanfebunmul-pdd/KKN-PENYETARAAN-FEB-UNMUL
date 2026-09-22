@@ -40,7 +40,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
           <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
             Hubungi Kami
           </p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors duration-300">
             Punya Pertanyaan? Ayo Bicara!
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
@@ -62,10 +62,10 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   {platformIcons[contact.platform] || platformIcons.Email}
                 </div>
                 <div>
-                  <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors">
+                  <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors duration-300">
                     {contact.platform}
                   </p>
-                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors">
+                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors duration-300">
                     {contact.value}
                   </p>
                 </div>
@@ -81,7 +81,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         <div className="space-y-12">
           {/* SUPPORT BY */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors">
+            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Support By
             </h3>
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
@@ -91,7 +91,8 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-dark-card rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-dark-border shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                  {/* PERUBAHAN: dark:bg-slate-100 biar logo hitam kelihatan */}
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -99,7 +100,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
                     {partner.nama}
                   </p>
                 </button>
@@ -109,7 +110,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
 
           {/* SPONSOR BY */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors">
+            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Sponsor By
             </h3>
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
@@ -119,7 +120,8 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-dark-card rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-dark-border shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                  {/* PERUBAHAN: dark:bg-slate-100 biar logo hitam kelihatan */}
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -127,7 +129,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
                     {partner.nama}
                   </p>
                 </button>
@@ -137,7 +139,6 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         </div>
       </div>
 
-      {/* MODAL */}
       {selectedPartner && (
         <PartnerModal
           partner={selectedPartner}
