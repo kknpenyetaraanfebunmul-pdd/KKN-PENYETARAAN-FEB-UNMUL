@@ -31,18 +31,22 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
   const [selectedPartner, setSelectedPartner] = useState<PartnerRow | null>(null);
 
   return (
-    <section id="contact" className="py-20 sm:py-28 px-5 sm:px-8">
+    <section
+      id="contact"
+      className="py-20 sm:py-28 px-5 sm:px-8 bg-bg dark:bg-dark-bg transition-colors duration-300"
+    >
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
             Hubungi Kami
           </p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors">
             Punya Pertanyaan? Ayo Bicara!
           </h2>
           <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
         </div>
 
+        {/* CONTACT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
           {contacts.map((contact, idx) => (
             <a
@@ -50,7 +54,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
               href={contact.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-card-bg rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light"
+              className="group bg-card-bg dark:bg-dark-card rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light dark:border-dark-border"
               style={{ animation: `fadeIn 0.5s ease ${idx * 0.1}s both` }}
             >
               <div className="flex items-center gap-4">
@@ -58,10 +62,10 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   {platformIcons[contact.platform] || platformIcons.Email}
                 </div>
                 <div>
-                  <p className="text-xs text-dark-purple/50 font-medium uppercase tracking-wide">
+                  <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors">
                     {contact.platform}
                   </p>
-                  <p className="text-dark-purple font-semibold text-sm">
+                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors">
                     {contact.value}
                   </p>
                 </div>
@@ -77,7 +81,9 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         <div className="space-y-12">
           {/* SUPPORT BY */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-dark-purple mb-6">Support By</h3>
+            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors">
+              Support By
+            </h3>
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
               {supportBy.map((partner) => (
                 <button
@@ -85,7 +91,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl p-4 flex items-center justify-center border border-bubble-light shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-dark-card rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-dark-border shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -93,7 +99,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
                     {partner.nama}
                   </p>
                 </button>
@@ -103,7 +109,9 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
 
           {/* SPONSOR BY */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-dark-purple mb-6">Sponsor By</h3>
+            <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors">
+              Sponsor By
+            </h3>
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
               {sponsorBy.map((partner) => (
                 <button
@@ -111,7 +119,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl p-4 flex items-center justify-center border border-bubble-light shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
+                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-dark-card rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-dark-border shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -119,7 +127,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors max-w-[140px] truncate">
                     {partner.nama}
                   </p>
                 </button>
