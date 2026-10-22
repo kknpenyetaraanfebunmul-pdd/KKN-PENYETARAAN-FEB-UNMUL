@@ -9,15 +9,15 @@ export const defaultContent: SiteContent = {
     slides: [
       {
         id: 's1',
-        url: 'https://images.pexels.com/photos/15830193/pexels-photo-15830193.jpeg?auto=compress&cs=tinysrgb&w=1920',
+        url: '/images/hero-1.jpg',
       },
       {
         id: 's2',
-        url: 'https://images.pexels.com/photos/9203969/pexels-photo-9203969.jpeg?auto=compress&cs=tinysrgb&w=1920',
+        url: '/images/hero-2.jpg',
       },
       {
         id: 's3',
-        url: 'https://images.pexels.com/photos/5232267/pexels-photo-5232267.jpeg?auto=compress&cs=tinysrgb&w=1920',
+        url: '/images/hero-3.jpg',
       },
     ],
   },
@@ -171,7 +171,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g1',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/11580455/pexels-photo-11580455.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-1.jpg',
       judul: 'Bimbingan Belajar',
       deskripsi: 'Mengajar anak-anak desa di balai desa setiap sore.',
       urutan: 1,
@@ -179,7 +179,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g2',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/28662953/pexels-photo-28662953.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-2.jpg',
       judul: 'Penghijauan Desa',
       deskripsi: 'Penanaman pohon bersama warga untuk lingkungan yang lebih hijau.',
       urutan: 2,
@@ -187,7 +187,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g3',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/8475199/pexels-photo-8475199.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-3.jpg',
       judul: 'Pelatihan UMKM',
       deskripsi: 'Mendampingi pedagang lokal memanfaatkan teknologi digital.',
       urutan: 3,
@@ -195,7 +195,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g4',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/8248293/pexels-photo-8248293.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-4.jpg',
       judul: 'Penyuluhan Kesehatan',
       deskripsi: 'Pemeriksaan kesehatan gratis untuk warga desa.',
       urutan: 4,
@@ -203,7 +203,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g5',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/27471164/pexels-photo-27471164.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-5.jpg',
       judul: 'Musyawarah Desa',
       deskripsi: 'Pertemuan warga untuk merencanakan program kerja KKN.',
       urutan: 5,
@@ -211,7 +211,7 @@ export const defaultContent: SiteContent = {
     {
       id: 'g6',
       tipe: 'photo',
-      url: 'https://images.pexels.com/photos/37472391/pexels-photo-37472391.jpeg?auto=compress&cs=tinysrgb&w=940',
+      url: '/images/gallery-6.jpg',
       judul: 'Jelajah Desa',
       deskripsi: 'Mengenal lebih dekat kehidupan sosial masyarakat desa.',
       urutan: 6,
@@ -241,14 +241,14 @@ export const defaultContent: SiteContent = {
     },
   ],
   supportBy: [
-    { id: 'sp1', grup: 'support', nama: 'Universitas Negeri', logo_url: 'https://placehold.co/150x60/7b5ea7/ffffff?text=UNIV', urutan: 1 },
-    { id: 'sp2', grup: 'support', nama: 'Kementerian Desa', logo_url: 'https://placehold.co/150x60/2b1c3d/ffffff?text=KEMDES', urutan: 2 },
-    { id: 'sp3', grup: 'support', nama: 'Pemda Kabupaten', logo_url: 'https://placehold.co/150x60/7b5ea7/ffffff?text=PEMDA', urutan: 3 },
+    { id: 'sp1', grup: 'support', nama: 'Universitas Negeri', logo_url: '/images/logo-univ.png', urutan: 1 },
+    { id: 'sp2', grup: 'support', nama: 'Kementerian Desa', logo_url: '/images/logo-kemdes.png', urutan: 2 },
+    { id: 'sp3', grup: 'support', nama: 'Pemda Kabupaten', logo_url: '/images/logo-pemda.png', urutan: 3 },
   ],
   sponsorBy: [
-    { id: 'sb1', grup: 'sponsor', nama: 'Bank Desa', logo_url: 'https://placehold.co/150x60/2b1c3d/ffffff?text=BANK+DESA', urutan: 1 },
-    { id: 'sb2', grup: 'sponsor', nama: 'Toko Sejahtera', logo_url: 'https://placehold.co/150x60/7b5ea7/ffffff?text=TOKO+SEJ', urutan: 2 },
-    { id: 'sb3', grup: 'sponsor', nama: 'Koperasi Tani', logo_url: 'https://placehold.co/150x60/2b1c3d/ffffff?text=KOP+TANI', urutan: 3 },
+    { id: 'sb1', grup: 'sponsor', nama: 'Bank Desa', logo_url: '/images/logo-bank-desa.png', urutan: 1 },
+    { id: 'sb2', grup: 'sponsor', nama: 'Toko Sejahtera', logo_url: '/images/logo-toko-sejahtera.png', urutan: 2 },
+    { id: 'sb3', grup: 'sponsor', nama: 'Koperasi Tani', logo_url: '/images/logo-koperasi-tani.png', urutan: 3 },
   ],
   footer: {
     copyright: '© 2025 KKN Penyetaraan. All rights reserved.',
