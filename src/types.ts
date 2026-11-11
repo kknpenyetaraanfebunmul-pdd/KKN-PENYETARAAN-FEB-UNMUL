@@ -5,6 +5,7 @@ export interface HeroData {
   subtitle: string;
   buttonText: string;
   slides: { id: string; url: string }[];
+  slides_mobile?: { id: string; url: string }[]; // <-- Tambahan untuk mobile
 }
 
 export interface FooterData {

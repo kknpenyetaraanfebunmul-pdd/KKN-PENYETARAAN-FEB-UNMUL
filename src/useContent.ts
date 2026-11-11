@@ -106,7 +106,11 @@ function sanitizeContent(content: Partial<SiteContent>): SiteContent {
   return {
     ...defaultContent,
     ...content,
-    hero: { ...defaultContent.hero, ...content.hero },
+    hero: { 
+      ...defaultContent.hero, 
+      ...content.hero,
+      slides_mobile: content.hero?.slides_mobile || [] // Fallback jika kosong
+    },
     footer: { ...defaultContent.footer, ...content.footer },
     struktur,
     programs,

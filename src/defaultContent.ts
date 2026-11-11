@@ -20,6 +20,7 @@ export const defaultContent: SiteContent = {
         url: '/images/hero-3.jpg',
       },
     ],
+    slides_mobile: [], // <-- Tambahan untuk mobile
   },
   struktur: [
     {
