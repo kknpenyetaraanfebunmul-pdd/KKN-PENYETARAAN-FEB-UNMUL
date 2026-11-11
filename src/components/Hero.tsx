@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import type { SiteContent } from '../types';
 
+// Hook sederhana untuk mendeteksi lebar layar
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => 
+    typeof window !== 'undefined' ? window.innerWidth < 1024 : false
+  );
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+}
+
 interface HeroProps {
   content: SiteContent['hero'];
 }
@@ -8,14 +21,25 @@ interface HeroProps {
 export default function Hero({ content }: HeroProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const isMobile = useIsMobile();
+
+  // Pilih gambar sesuai device. Jika mobile kosong, pakai desktop.
+  const activeSlides = (isMobile && content.slides_mobile && content.slides_mobile.length > 0) 
+    ? content.slides_mobile 
+    : content.slides;
 
   useEffect(() => {
-    if (content.slides.length <= 1) return;
+    if (activeSlides.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % content.slides.length);
+      setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [content.slides.length]);
+  }, [activeSlides.length]);
+
+  // Reset index jika pindah device
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [isMobile]);
 
   const scrollToStruktur = () => {
     const el = document.getElementById('struktur');
@@ -54,7 +78,7 @@ export default function Hero({ content }: HeroProps) {
         }
       `}</style>
 
-      {content.slides.map((slide, idx) => {
+      {activeSlides.map((slide, idx) => {
         const isActive = idx === currentSlide;
         const isEven = idx % 2 === 0;
         
@@ -113,9 +137,9 @@ export default function Hero({ content }: HeroProps) {
         </div>
       </div>
 
-      {content.slides.length > 1 && (
+      {activeSlides.length > 1 && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-          {content.slides.map((_, idx) => (
+          {activeSlides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
