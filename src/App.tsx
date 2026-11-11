@@ -7,7 +7,6 @@ import Hero from './components/Hero';
 import Struktur from './components/Struktur';
 import Program from './components/Program';
 import Gallery from './components/Gallery';
-import InstagramFeed from './components/InstagramFeed';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -148,7 +147,6 @@ function MainApp() {
         <Struktur content={content.struktur} />
         <Program content={content.programs} />
         <Gallery content={content.gallery} />
-        <InstagramFeed />
         <Contact
           contacts={content.contacts}
           supportBy={content.supportBy}
