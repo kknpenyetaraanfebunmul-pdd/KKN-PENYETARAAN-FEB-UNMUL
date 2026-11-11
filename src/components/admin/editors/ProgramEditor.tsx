@@ -19,12 +19,14 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
         ...prev.programs,
         {
           id,
+          key: `program_${Date.now()}`,
           icon: '✨',
-          title: '',
-          shortDesc: '',
-          fullDesc: '',
-          activities: [],
+          judul: '',
+          subjudul: '',
+          deskripsi_lengkap: '',
+          kegiatan: [],
           info: { sasaran: '', jadwal: '', lokasi: '', target: '' },
+          urutan: prev.programs.length + 1,
         },
       ],
     }));
@@ -54,7 +56,7 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
       ...prev,
       programs: prev.programs.map((p) =>
         p.id === id
-          ? { ...p, activities: p.activities.map((a, i) => (i === idx ? value : a)) }
+          ? { ...p, kegiatan: p.kegiatan.map((a, i) => (i === idx ? value : a)) }
           : p
       ),
     }));
@@ -64,7 +66,7 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
     updateDraft((prev) => ({
       ...prev,
       programs: prev.programs.map((p) =>
-        p.id === id ? { ...p, activities: [...p.activities, ''] } : p
+        p.id === id ? { ...p, kegiatan: [...p.kegiatan, ''] } : p
       ),
     }));
   };
@@ -74,7 +76,7 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
       ...prev,
       programs: prev.programs.map((p) =>
         p.id === id
-          ? { ...p, activities: p.activities.filter((_, i) => i !== idx) }
+          ? { ...p, kegiatan: p.kegiatan.filter((_, i) => i !== idx) }
           : p
       ),
     }));
@@ -110,8 +112,8 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
             />
             <input
               type="text"
-              value={program.title}
-              onChange={(e) => updateProgram(program.id, 'title', e.target.value)}
+              value={program.judul}
+              onChange={(e) => updateProgram(program.id, 'judul', e.target.value)}
               placeholder="Judul program"
               className="flex-1 bg-white rounded-lg px-3 py-2 text-sm font-semibold text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
             />
@@ -135,8 +137,8 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
                 <label className="block text-xs font-semibold text-dark-purple/70 mb-1.5">Deskripsi Singkat</label>
                 <input
                   type="text"
-                  value={program.shortDesc}
-                  onChange={(e) => updateProgram(program.id, 'shortDesc', e.target.value)}
+                  value={program.subjudul}
+                  onChange={(e) => updateProgram(program.id, 'subjudul', e.target.value)}
                   className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
                 />
               </div>
@@ -144,8 +146,8 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
               <div>
                 <label className="block text-xs font-semibold text-dark-purple/70 mb-1.5">Deskripsi Lengkap</label>
                 <textarea
-                  value={program.fullDesc}
-                  onChange={(e) => updateProgram(program.id, 'fullDesc', e.target.value)}
+                  value={program.deskripsi_lengkap}
+                  onChange={(e) => updateProgram(program.id, 'deskripsi_lengkap', e.target.value)}
                   rows={4}
                   className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none resize-none"
                 />
@@ -162,7 +164,7 @@ export default function ProgramEditor({ draft, updateDraft }: Props) {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {program.activities.map((activity, idx) => (
+                  {program.kegiatan.map((activity, idx) => (
                     <div key={idx} className="flex items-center gap-2">
                       <span className="text-xs text-dark-purple/40 w-5">{idx + 1}.</span>
                       <input

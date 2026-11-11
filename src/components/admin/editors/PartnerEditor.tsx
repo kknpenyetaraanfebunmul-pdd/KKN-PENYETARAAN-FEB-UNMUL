@@ -100,7 +100,7 @@ export default function PartnerEditor({ draft, updateDraft }: Props) {
                 onChange={(e) =>
                   updatePartner(section, partner.id, 'logo_url', e.target.value)
                 }
-                placeholder="URL logo (contoh: https://.../logo.png)"
+                placeholder="Path/URL logo (cth: /images/logo-univ.png)"
                 className="bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
               />
             </div>

@@ -26,6 +26,16 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
+  /* Mencegah glitch/kedip saat ganti tema */
+  transition: background-color 0.4s ease, color 0.4s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Memastikan animasi tidak memicu glitch pada elemen ber-blur */
+* {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 body.modal-open {

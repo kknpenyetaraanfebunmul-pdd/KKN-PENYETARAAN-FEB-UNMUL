@@ -5,7 +5,7 @@ import { ADMIN_SESSION_KEY, ADMIN_PASSCODE } from '../useContent';
 
 interface FooterProps {
   content: SiteContent['footer'];
-  onAdminAccess: () => void;
+  onAdminAccess?: () => void;
 }
 
 export default function Footer({ content, onAdminAccess }: FooterProps) {
@@ -16,6 +16,8 @@ export default function Footer({ content, onAdminAccess }: FooterProps) {
   const [error, setError] = useState(false);
 
   const handleCopyrightClick = () => {
+    // Di situs publik tidak ada pintu admin. Admin lewat halaman /admin
+    if (!onAdminAccess) return;
     const now = Date.now();
     if (now - lastClickRef.current > 2000) {
       clickCountRef.current = 1;
@@ -42,7 +44,7 @@ export default function Footer({ content, onAdminAccess }: FooterProps) {
       setShowPasscode(false);
       setPasscode('');
       setError(false);
-      onAdminAccess();
+      onAdminAccess?.();
     } else {
       setError(true);
     }

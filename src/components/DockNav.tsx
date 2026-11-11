@@ -1,4 +1,4 @@
-import { Home, Users, Briefcase, Images, Mail, Sun, Moon } from 'lucide-react';
+import { Home, Users, Briefcase, Images, Mail, Sun, Moon, Instagram } from 'lucide-react';
 import { useTheme } from '../ThemeContext';
 
 const dockItems = [
@@ -6,6 +6,7 @@ const dockItems = [
   { id: 'struktur', label: 'Struktur', icon: Users },
   { id: 'program', label: 'Program', icon: Briefcase },
   { id: 'gallery', label: 'Gallery', icon: Images },
+  { id: 'instagram', label: 'Instagram', icon: Instagram }, // <-- Tambahkan icon Instagram dari lucide-react
   { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
@@ -43,7 +44,7 @@ export default function DockNav({ activeSection, visible }: DockNavProps) {
               <button
                 key={item.id}
                 onClick={() => handleNav(item.id)}
-                className={`relative flex items-center justify-center rounded-full transition-all duration-300 ${
+                className={`relative flex items-center justify-center rounded-full transition-all duration-500 ease-out ${
                   isActive
                     ? 'w-12 h-12 bg-primary-purple text-white'
                     : 'w-10 h-10 text-white/60 hover:text-white hover:bg-white/10'

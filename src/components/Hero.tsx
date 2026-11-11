@@ -86,7 +86,11 @@ export default function Hero({ content }: HeroProps) {
         );
       })}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-purple/70 via-dark-purple/50 to-dark-purple/80" />
+      {/* Overlay Gradasi Utama (Gelap di atas, transparan di tengah) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-dark-purple/70 via-dark-purple/30 to-transparent" />
+      
+      {/* Overlay Gradasi Bawah (Smooth Transition) */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none transition-colors duration-500 bg-bg/40 dark:bg-dark-bg/40" style={{ maskImage: 'linear-gradient(to top, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)' }} />
 
       <div className="relative z-10 text-center px-5 max-w-4xl mx-auto">
         <div className="animate-fade-in">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play, Instagram } from 'lucide-react';
 import type { SiteContent } from '../types';
 
 interface GalleryProps {
@@ -217,6 +217,7 @@ export default function Gallery({ content }: GalleryProps) {
             {extendedContent.map((item, idx) => {
               const realIndex = idx % content.length;
               const isVideo = item.tipe === 'video';
+              const isIG = item.tipe === 'instagram';
 
               return (
                 <div
@@ -224,7 +225,12 @@ export default function Gallery({ content }: GalleryProps) {
                   className="flex-shrink-0 h-[300px] sm:h-[450px] w-fit group cursor-pointer relative rounded-3xl overflow-hidden shadow-lg bg-card-bg dark:bg-dark-card"
                   onClick={() => {
                     if (!dragState.current.hasDragged) {
-                      setLightbox(realIndex);
+                      if (isIG) {
+                        // Langsung buka link Instagram di tab baru
+                        window.open(item.url, '_blank', 'noopener,noreferrer');
+                      } else {
+                        setLightbox(realIndex);
+                      }
                     }
                     dragState.current.hasDragged = false;
                   }}
@@ -237,19 +243,26 @@ export default function Gallery({ content }: GalleryProps) {
                         loop
                         playsInline
                         preload="metadata"
-                        className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+                        className="h-full w-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                       />
                       <div className="absolute inset-0 flex items-center justify-center bg-dark-purple/20 pointer-events-none">
                         <Play size={48} className="text-white fill-white opacity-80" />
                       </div>
                     </>
+                  ) : isIG ? (
+                    /* Tampilan Khusus Item Instagram */
+                    <div className="h-full w-[280px] sm:w-[350px] bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex flex-col items-center justify-center text-white p-6 transition-transform duration-500 group-hover:scale-110 pointer-events-none">
+                      <Instagram size={64} className="mb-4 opacity-90 drop-shadow-md" />
+                      <h3 className="text-xl font-bold text-center mb-2">{item.judul || 'Lihat Post'}</h3>
+                      <p className="text-white/80 text-sm text-center line-clamp-2">{item.deskripsi || 'Klik untuk buka di Instagram'}</p>
+                    </div>
                   ) : (
                     <img
                       src={item.url}
                       alt={item.judul}
                       loading="lazy"
                       draggable={false}
-                      className="h-full w-auto object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+                      className="h-full w-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                     />
                   )}
 

@@ -45,7 +45,7 @@ export interface ProgramRow {
 
 export interface GalleryRow {
   id: string;
-  tipe: 'photo' | 'video';
+  tipe: 'photo' | 'video' | 'instagram';
   url: string;
   judul: string;
   deskripsi: string;
@@ -78,3 +78,5 @@ export interface SiteData {
   supportBy: PartnerRow[];
   sponsorBy: PartnerRow[];
 }
+
+export type SiteContent = SiteData;

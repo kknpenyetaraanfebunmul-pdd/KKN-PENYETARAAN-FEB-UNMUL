@@ -7,11 +7,18 @@ import Hero from './components/Hero';
 import Struktur from './components/Struktur';
 import Program from './components/Program';
 import Gallery from './components/Gallery';
+import InstagramFeed from './components/InstagramFeed';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminLogin from './components/admin/AdminLogin';
 
 const sections = ['home', 'struktur', 'program', 'gallery', 'contact'];
+
+// Halaman operator: /admin (contoh: localhost:5173/admin)
+const IS_ADMIN_PAGE =
+  window.location.pathname === '/admin' ||
+  window.location.pathname.startsWith('/admin/');
 
 // ============================================
 // KOMPONEN LOADING SCREEN
@@ -47,7 +54,9 @@ function MainApp() {
   const { content, updateContent, resetContent, loading } = useContent();
   const [activeSection, setActiveSection] = useState('home');
   const [showDock, setShowDock] = useState(false);
-  const [adminMode, setAdminMode] = useState(false);
+  const [adminMode, setAdminMode] = useState(
+    IS_ADMIN_PAGE && sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true'
+  );
 
   useEffect(() => {
     if (adminMode) {
@@ -94,22 +103,24 @@ function MainApp() {
     };
   }, [adminMode, loading]);
 
-  const handleAdminAccess = () => setAdminMode(true);
-  const handleAdminExit = () => setAdminMode(false);
+  const handleAdminExit = () => {
+    // Kembali ke situs publik
+    window.location.href = '/';
+  };
 
   const handleLogout = () => {
     sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    setAdminMode(false);
+    window.location.href = '/admin';
   };
 
   // ============================================
-  // LOADING STATE
+  // HALAMAN /admin: hanya login + dashboard
   // ============================================
-  if (loading && !adminMode) {
-    return <LoadingScreen />;
-  }
-
-  if (adminMode) {
+  if (IS_ADMIN_PAGE) {
+    if (!adminMode) {
+      return <AdminLogin onSuccess={() => setAdminMode(true)} />;
+    }
+    if (loading) return <LoadingScreen />;
     return (
       <AdminDashboard
         content={content}
@@ -121,8 +132,15 @@ function MainApp() {
     );
   }
 
+  // ============================================
+  // LOADING STATE
+  // ============================================
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <div className="min-h-screen bg-bg dark:bg-dark-bg transition-colors duration-300">
+    <div className="min-h-screen bg-bg dark:bg-dark-bg transition-colors duration-500">
       <Header activeSection={activeSection} visible={!showDock} />
 
       <main>
@@ -130,13 +148,14 @@ function MainApp() {
         <Struktur content={content.struktur} />
         <Program content={content.programs} />
         <Gallery content={content.gallery} />
+        <InstagramFeed />
         <Contact
           contacts={content.contacts}
           supportBy={content.supportBy}
           sponsorBy={content.sponsorBy}
         />
       </main>
-      <Footer content={content.footer} onAdminAccess={handleAdminAccess} />
+      <Footer content={content.footer} />
       <DockNav activeSection={activeSection} visible={showDock} />
     </div>
   );

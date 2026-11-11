@@ -103,7 +103,7 @@ export default function HeroEditor({ draft, updateDraft }: Props) {
                 type="text"
                 value={slide.url}
                 onChange={(e) => updateSlide(slide.id, e.target.value)}
-                placeholder="URL gambar"
+                placeholder="Path/URL (cth: /images/hero-1.jpg)"
                 className="flex-1 bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
               />
               <button

@@ -56,7 +56,7 @@ export default function GalleryEditor({ draft, updateDraft }: Props) {
       {draft.gallery.map((item) => (
         <div key={item.id} className="bg-card-bg rounded-xl p-4 space-y-3">
           <div className="flex items-start gap-3">
-            {item.url && (
+            {item.url && item.tipe !== 'instagram' && (
               <div className="w-16 h-16 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-bubble-light">
                 {item.tipe === 'video' ? (
                   <video
@@ -85,12 +85,17 @@ export default function GalleryEditor({ draft, updateDraft }: Props) {
                 >
                   <option value="photo">Foto</option>
                   <option value="video">Video</option>
+                  <option value="instagram">Post IG</option>
                 </select>
                 <input
                   type="text"
                   value={item.url}
                   onChange={(e) => updateItem(item.id, 'url', e.target.value)}
-                  placeholder="URL gambar/video (https://...)"
+                  placeholder={
+                    item.tipe === 'instagram'
+                      ? 'Link Post IG (cth: https://instagram.com/p/...)'
+                      : 'Path/URL (cth: /images/gallery-1.jpg)'
+                  }
                   className="flex-1 bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
                 />
               </div>

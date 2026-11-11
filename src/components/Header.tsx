@@ -7,6 +7,7 @@ const navItems = [
   { id: 'struktur', label: 'Struktur' },
   { id: 'program', label: 'Program Kerja' },
   { id: 'gallery', label: 'Gallery' },
+  { id: 'instagram', label: 'Instagram' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -51,13 +52,14 @@ export default function Header({ activeSection, visible = true }: HeaderProps) {
         {/* Logo */}
         <button
           onClick={() => handleNav('home')}
-          className="text-2xl font-extrabold tracking-tight"
+          className="flex items-center justify-center transition-transform hover:scale-105"
           aria-label="KKN home"
         >
-          <span className="bg-gradient-to-r from-primary-purple to-purple-300 bg-clip-text text-transparent">
-            KKN
-          </span>
-          <span className="text-white">.</span>
+          <img 
+            src="/images/logo.png" 
+            alt="Logo KKN" 
+            className="h-10 sm:h-12 w-auto object-contain" 
+          />
         </button>
 
         {/* Desktop Nav + Theme Toggle */}
@@ -67,7 +69,7 @@ export default function Header({ activeSection, visible = true }: HeaderProps) {
               <button
                 key={item.id}
                 onClick={() => handleNav(item.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-out ${
                   activeSection === item.id
                     ? 'bg-primary-purple text-white shadow-md'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
