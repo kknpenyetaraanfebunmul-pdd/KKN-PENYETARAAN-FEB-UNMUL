@@ -109,7 +109,9 @@ function sanitizeContent(content: Partial<SiteContent>): SiteContent {
     hero: { 
       ...defaultContent.hero, 
       ...content.hero,
-      slides_mobile: content.hero?.slides_mobile || [] // Fallback jika kosong
+      // Pastikan array mobile selalu ada dan berbentuk array
+      slides: Array.isArray(content.hero?.slides) ? content.hero.slides : defaultContent.hero.slides,
+      slides_mobile: Array.isArray(content.hero?.slides_mobile) ? content.hero.slides_mobile : [],
     },
     footer: { ...defaultContent.footer, ...content.footer },
     struktur,
