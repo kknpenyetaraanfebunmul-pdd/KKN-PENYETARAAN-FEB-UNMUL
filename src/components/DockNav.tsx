@@ -6,7 +6,6 @@ const dockItems = [
   { id: 'struktur', label: 'Struktur', icon: Users },
   { id: 'program', label: 'Program', icon: Briefcase },
   { id: 'gallery', label: 'Gallery', icon: Images },
-  { id: 'instagram', label: 'Instagram', icon: Instagram }, // <-- Tambahkan icon Instagram dari lucide-react
   { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
