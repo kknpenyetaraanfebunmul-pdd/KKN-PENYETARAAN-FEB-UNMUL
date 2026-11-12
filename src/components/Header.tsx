@@ -55,7 +55,7 @@ export default function Header({ activeSection, visible = true }: HeaderProps) {
           aria-label="KKN home"
         >
           <img 
-            src="/images/logo.png" 
+            src="/images/logo.webp" 
             alt="Logo KKN" 
             className="h-10 sm:h-12 w-auto object-contain" 
           />

@@ -242,14 +242,14 @@ export const defaultContent: SiteContent = {
     },
   ],
   supportBy: [
-    { id: 'sp1', grup: 'support', nama: 'Universitas Negeri', logo_url: '/images/logo-univ.png', urutan: 1 },
-    { id: 'sp2', grup: 'support', nama: 'Kementerian Desa', logo_url: '/images/logo-kemdes.png', urutan: 2 },
-    { id: 'sp3', grup: 'support', nama: 'Pemda Kabupaten', logo_url: '/images/logo-pemda.png', urutan: 3 },
+    { id: 'sp1', grup: 'support', nama: 'Universitas Negeri', logo_url: '/images/logo-univ.webp', urutan: 1 },
+    { id: 'sp2', grup: 'support', nama: 'Kementerian Desa', logo_url: '/images/logo-kemdes.webp', urutan: 2 },
+    { id: 'sp3', grup: 'support', nama: 'Pemda Kabupaten', logo_url: '/images/logo-pemda.webp', urutan: 3 },
   ],
   sponsorBy: [
-    { id: 'sb1', grup: 'sponsor', nama: 'Bank Desa', logo_url: '/images/logo-bank-desa.png', urutan: 1 },
-    { id: 'sb2', grup: 'sponsor', nama: 'Toko Sejahtera', logo_url: '/images/logo-toko-sejahtera.png', urutan: 2 },
-    { id: 'sb3', grup: 'sponsor', nama: 'Koperasi Tani', logo_url: '/images/logo-koperasi-tani.png', urutan: 3 },
+    { id: 'sb1', grup: 'sponsor', nama: 'Bank Desa', logo_url: '/images/logo-bank-desa.webp', urutan: 1 },
+    { id: 'sb2', grup: 'sponsor', nama: 'Toko Sejahtera', logo_url: '/images/logo-toko-sejahtera.webp', urutan: 2 },
+    { id: 'sb3', grup: 'sponsor', nama: 'Koperasi Tani', logo_url: '/images/logo-koperasi-tani.webp', urutan: 3 },
   ],
   footer: {
     copyright: '© 2025 KKN Penyetaraan. All rights reserved.',

@@ -32,7 +32,7 @@ function LoadingScreen() {
           {/* Bingkai Bulat di dalamnya */}
           <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner">
             <img 
-              src="/images/logo.png" 
+              src="/images/logo.webp" 
               alt="Logo KKN" 
               className="w-full h-full object-cover" 
             />
