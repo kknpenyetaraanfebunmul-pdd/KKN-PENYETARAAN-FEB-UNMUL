@@ -24,9 +24,9 @@ export default {
         'fade-in': 'fadeIn 0.6s ease forwards',
         'slide-up': 'slideUp 0.5s ease forwards',
         heartbeat: 'heartbeat 1.5s ease-in-out infinite',
-        'reveal': 'reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-        'reveal-left': 'revealLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-        'reveal-right': 'revealRight 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'reveal': 'reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'reveal-left': 'revealLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'reveal-right': 'revealRight 1.2s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
       keyframes: {
         slideCarousel: {

@@ -14,16 +14,13 @@ export default function Reveal({ children, delay = 0, direction = 'up', classNam
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Hanya munculkan saat elemen masuk layar dari bawah
         if (entry.isIntersecting) {
           setIsVisible(true);
           observer.unobserve(entry.target);
         }
       },
       { 
-        // rootMargin negatif di bawah (-15%) memaksa elemen harus masuk 
-        // sejauh 15% dari bawah layar baru animasi terpicu.
-        rootMargin: '0px 0px -15% 0px',
+        rootMargin: '0px 0px -10% 0px',
         threshold: 0.1 
       }
     );
@@ -42,7 +39,8 @@ export default function Reveal({ children, delay = 0, direction = 'up', classNam
   return (
     <div
       ref={ref}
-      className={`${className} ${isVisible ? animationClass : 'opacity-0 invisible'}`}
+      // Kita gunakan opacity-0 saja (tanpa invisible) agar animasinya bisa jalan
+      className={`${className} ${isVisible ? animationClass : 'opacity-0'}`}
       style={{ 
         animationDelay: `${delay}ms`,
         willChange: 'transform, opacity' 
