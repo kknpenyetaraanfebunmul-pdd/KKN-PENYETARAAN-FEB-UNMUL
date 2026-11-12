@@ -1,8 +1,8 @@
-import Reveal from './Reveal';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { SiteContent, PartnerRow } from '../types';
 import PartnerModal from './PartnerModal';
+import Reveal from './Reveal';
 
 interface ContactProps {
   contacts: SiteContent['contacts'];
@@ -37,46 +37,47 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
       className="py-20 sm:py-28 px-5 sm:px-8 bg-bg dark:bg-dark-bg transition-colors duration-300"
     >
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
-            Hubungi Kami
-          </p>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors duration-300">
-            Punya Pertanyaan? Ayo Bicara!
-          </h2>
-          <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
-        </div>
+        <Reveal direction="up">
+          <div className="text-center mb-14">
+            <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
+              Hubungi Kami
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors duration-300">
+              Punya Pertanyaan? Ayo Bicara!
+            </h2>
+            <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
+          </div>
+        </Reveal>
 
         {/* CONTACT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
           {contacts.map((contact, idx) => (
             <Reveal key={contact.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="w-full h-full">
               <a
-                key={contact.id}
                 href={contact.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-card-bg dark:bg-dark-card rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light dark:border-dark-border"
-              style={{ animation: `fadeIn 0.5s ease ${idx * 0.1}s both` }}
-            >
-              <div className="flex items-center gap-4 min-w-0 flex-1">
-                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-primary-purple/10 text-primary-purple transition-all duration-300 group-hover:bg-primary-purple group-hover:text-white">
-                  {platformIcons[contact.platform] || platformIcons.Email}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-card-bg dark:bg-dark-card rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light dark:border-dark-border h-full"
+              >
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-primary-purple/10 text-primary-purple transition-all duration-300 group-hover:bg-primary-purple group-hover:text-white">
+                    {platformIcons[contact.platform] || platformIcons.Email}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors duration-300">
+                      {contact.platform}
+                    </p>
+                    <p className="text-dark-purple dark:text-dark-text font-semibold text-xs sm:text-sm transition-colors duration-300 break-words leading-tight">
+                      {contact.value}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors duration-300">
-                    {contact.platform}
-                  </p>
-                  <p className="text-dark-purple dark:text-dark-text font-semibold text-xs sm:text-sm transition-colors duration-300 break-words leading-tight">
-                    {contact.value}
-                  </p>
-                </div>
-              </div>
-              <ArrowRight
-                size={20}
-                className="flex-shrink-0 text-primary-purple/40 transition-all duration-300 group-hover:text-primary-purple group-hover:translate-x-1 ml-2"
-              />
-            </a>
+                <ArrowRight
+                  size={20}
+                  className="flex-shrink-0 text-primary-purple/40 transition-all duration-300 group-hover:text-primary-purple group-hover:translate-x-1 ml-2"
+                />
+              </a>
+            </Reveal>
           ))}
         </div>
 
@@ -86,31 +87,29 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Support By
             </h3>
-            {/* Menggunakan GRID agar sejajar sempurna */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
               {supportBy.map((partner, idx) => (
                 <Reveal key={partner.id} delay={idx * 100} direction={idx % 2 === 0 ? 'left' : 'right'}>
-                <button
-                  key={partner.id}
-                  onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                >
-                  <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
-                    <img
-                      src={partner.logo_url}
-                      alt={partner.nama}
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
-                      }}
-                    />
-                  </div>
-                  {/* h-10 memaksa tinggi teks selalu sama (setara 2 baris) agar logo sejajar */}
-                  <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
-                    {partner.nama}
-                  </p>
-                </button>
+                  <button
+                    onClick={() => setSelectedPartner(partner)}
+                    className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  >
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                      <img
+                        src={partner.logo_url}
+                        alt={partner.nama}
+                        className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
+                        }}
+                      />
+                    </div>
+                    <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
+                      {partner.nama}
+                    </p>
+                  </button>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -120,30 +119,29 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Sponsor By
             </h3>
-            {/* Menggunakan GRID agar sejajar sempurna */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
-              {sponsorBy.map((partner) => (
-                <button
-                  key={partner.id}
-                  onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                >
-                  <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
-                    <img
-                      src={partner.logo_url}
-                      alt={partner.nama}
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
-                      }}
-                    />
-                  </div>
-                  {/* h-10 memaksa tinggi teks selalu sama (setara 2 baris) agar logo sejajar */}
-                  <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
-                    {partner.nama}
-                  </p>
-                </button>
+              {sponsorBy.map((partner, idx) => (
+                <Reveal key={partner.id} delay={idx * 100} direction={idx % 2 === 0 ? 'left' : 'right'}>
+                  <button
+                    onClick={() => setSelectedPartner(partner)}
+                    className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  >
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                      <img
+                        src={partner.logo_url}
+                        alt={partner.nama}
+                        className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
+                        }}
+                      />
+                    </div>
+                    <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
+                      {partner.nama}
+                    </p>
+                  </button>
+                </Reveal>
               ))}
             </div>
           </div>
