@@ -48,7 +48,8 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
 
         {/* Logo */}
         <div className="p-8 flex items-center justify-center bg-white dark:bg-dark-bg transition-colors duration-300">
-          <div className="w-48 h-48 rounded-2xl bg-card-bg dark:bg-dark-card border border-bubble-light dark:border-dark-border flex items-center justify-center p-6 transition-colors duration-300">
+          {/* Mengubah bg-card-bg/dark-card menjadi bg-white di kedua mode agar logo gelap tetap terlihat */}
+          <div className="w-48 h-48 rounded-2xl bg-white dark:bg-slate-100 border border-bubble-light dark:border-slate-300 shadow-sm flex items-center justify-center p-6 transition-colors duration-300">
             <img
               src={partner.logo_url}
               alt={partner.nama}
