@@ -11,19 +11,20 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Memicu animasi masuk
     setIsVisible(true);
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleKey);
     document.body.classList.add('modal-open');
+    
     return () => {
       window.removeEventListener('keydown', handleKey);
       document.body.classList.remove('modal-open');
     };
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() =  }, [onClose]);
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -32,8 +33,7 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
     }, 300);
   };
 
-  return (> {
-    setIsVisible(true);
+  return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md p-4 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
@@ -65,7 +65,6 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
 
         {/* Logo */}
         <div className="p-8 flex items-center justify-center bg-white dark:bg-dark-bg transition-colors duration-300">
-          {/* Mengubah bg-card-bg/dark-card menjadi bg-white di kedua mode agar logo gelap tetap terlihat */}
           <div className="w-48 h-48 rounded-2xl bg-white dark:bg-slate-100 border border-bubble-light dark:border-slate-300 shadow-sm flex items-center justify-center p-6 transition-colors duration-300">
             <img
               src={partner.logo_url}
