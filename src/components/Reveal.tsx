@@ -14,36 +14,41 @@ export default function Reveal({ children, delay = 0, direction = 'up', classNam
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
+        // true jika masuk layar, false jika keluar layar
+        setIsVisible(entry.isIntersecting);
       },
-      { 
-        rootMargin: '0px 0px -10% 0px',
-        threshold: 0.1 
+      {
+        threshold: 0.1, // Muncul saat 10% elemen terlihat
+        rootMargin: '0px 0px -5% 0px'
       }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
     return () => {
       if (ref.current) observer.unobserve(ref.current);
     };
   }, []);
 
-  const animationClass = 
-    direction === 'left' ? 'animate-reveal-left' : 
-    direction === 'right' ? 'animate-reveal-right' : 
-    'animate-reveal';
+  // Menentukan posisi awal (transparan & bergeser)
+  let hiddenClass = 'opacity-0 translate-y-16 scale-95';
+  if (direction === 'left') hiddenClass = 'opacity-0 -translate-x-16 scale-95';
+  if (direction === 'right') hiddenClass = 'opacity-0 translate-x-16 scale-95';
+
+  // Posisi akhir (terlihat penuh & di tengah)
+  const visibleClass = 'opacity-100 translate-x-0 translate-y-0 scale-100';
 
   return (
     <div
       ref={ref}
-      // Kita gunakan opacity-0 saja (tanpa invisible) agar animasinya bisa jalan
-      className={`${className} ${isVisible ? animationClass : 'opacity-0'}`}
-      style={{ 
-        animationDelay: `${delay}ms`,
-        willChange: 'transform, opacity' 
+      className={`${className} transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        isVisible ? visibleClass : hiddenClass
+      }`}
+      style={{
+        // Delay hanya berlaku saat masuk. Saat keluar (scroll dijauhkan), hilangnya langsung instan.
+        transitionDelay: isVisible ? `${delay}ms` : '0ms'
       }}
     >
       {children}
