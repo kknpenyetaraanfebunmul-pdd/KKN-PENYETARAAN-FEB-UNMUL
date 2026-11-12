@@ -23,7 +23,8 @@ export interface StrukturMember {
 export interface StrukturRow {
   id: string;
   jabatan: string;
-  members: StrukturMember[]; // <-- Ini yang berubah
+  foto_bidang?: string; // <-- Tambahan untuk cover bidang
+  members: StrukturMember[];
   urutan: number;
 }
 

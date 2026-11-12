@@ -17,6 +17,7 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
         {
           id: generateId('st'),
           jabatan: '',
+          foto_bidang: '',
           members: [{ name: '', nim: '', photo: '' }],
           urutan: prev.struktur.length + 1,
         },
@@ -32,12 +33,12 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
     }));
   };
 
-  // Mengubah nama jabatan
-  const updateRole = (id: string, value: string) => {
+  // Mengubah field jabatan atau foto_bidang
+  const updateRoleData = (id: string, field: 'jabatan' | 'foto_bidang', value: string) => {
     updateDraft((prev) => ({
       ...prev,
       struktur: prev.struktur.map((item) =>
-        item.id === id ? { ...item, jabatan: value } : item
+        item.id === id ? { ...item, [field]: value } : item
       ),
     }));
   };
@@ -114,26 +115,39 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
           key={item.id}
           className="bg-card-bg rounded-xl p-4 border border-bubble-light space-y-4"
         >
-          {/* Bagian Atas: Nama Jabatan */}
-          <div className="flex items-center gap-3">
+          {/* Bagian Atas: Nama Jabatan & Foto Bidang */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={item.jabatan || ''}
+                onChange={(e) => updateRoleData(item.id, 'jabatan', e.target.value)}
+                placeholder="Nama jabatan (cth: Ketua)"
+                className="flex-1 bg-white rounded-lg px-3 py-2 text-sm font-semibold text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
+              />
+              <button
+                onClick={() => removeRole(item.id)}
+                className="text-red-400 hover:text-red-500 p-1"
+                title="Hapus Jabatan"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+            
             <input
               type="text"
-              value={item.jabatan || ''}
-              onChange={(e) => updateRole(item.id, e.target.value)}
-              placeholder="Nama jabatan (cth: Ketua)"
-              className="flex-1 bg-white rounded-lg px-3 py-2 text-sm font-semibold text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
+              value={item.foto_bidang || ''}
+              onChange={(e) => updateRoleData(item.id, 'foto_bidang', e.target.value)}
+              placeholder="Path/URL Foto Bidang (cth: /images/bidang-ketua.jpg)"
+              className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
             />
-            <button
-              onClick={() => removeRole(item.id)}
-              className="text-red-400 hover:text-red-500 p-1"
-              title="Hapus Jabatan"
-            >
-              <Trash2 size={18} />
-            </button>
+            <p className="text-[10px] text-dark-purple/50 px-1">
+              *Kosongkan jika ingin otomatis menggunakan foto anggota pertama.
+            </p>
           </div>
 
           {/* Bagian Bawah: Daftar Anggota */}
-          <div className="space-y-3 pl-2 border-l-2 border-primary-purple/20">
+          <div className="space-y-3 pl-2 border-l-2 border-primary-purple/20 pt-2">
             {item.members.map((member, index) => (
               <div
                 key={index}
@@ -178,7 +192,7 @@ export default function StrukturEditor({ draft, updateDraft }: Props) {
                   onChange={(e) =>
                     updateMember(item.id, index, 'photo', e.target.value)
                   }
-                  placeholder="Path/URL foto (cth: /images/anggota-1.jpg)"
+                  placeholder="Path/URL foto anggota (cth: /images/anggota-1.jpg)"
                   className="w-full bg-white rounded-lg px-3 py-2 text-sm text-dark-purple border border-transparent focus:border-primary-purple focus:outline-none"
                 />
               </div>

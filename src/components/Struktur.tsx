@@ -65,9 +65,9 @@ export default function Struktur({ content }: StrukturProps) {
                 <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center items-center lg:items-stretch gap-4 sm:gap-8 w-full">
                   {row.map(({ item, idx }, rowIdx) => {
                     const Icon = iconMap[item.jabatan] || Users;
-                    const photos = (item.members || [])
-                      .filter((m) => m.photo)
-                      .slice(0, 1);
+                    // Logika Prioritas: Foto Bidang -> Foto Anggota Pertama -> Kosong (Ikon)
+                    const firstMemberPhoto = (item.members || []).find((m) => m.photo)?.photo;
+                    const coverPhoto = item.foto_bidang || firstMemberPhoto;
 
                     return (
                       <Reveal
@@ -99,11 +99,11 @@ export default function Struktur({ content }: StrukturProps) {
                           <div className="relative z-10 flex flex-col items-center flex-grow w-full">
                             {/* Foto Cover / Avatar (Desain Full Banner) */}
                             <div className="w-full relative flex-shrink-0">
-                              {photos.length > 0 ? (
+                              {coverPhoto ? (
                                 <div className="w-full h-48 sm:h-56 overflow-hidden relative">
                                   <img
-                                    src={photos[0].photo}
-                                    alt={photos[0].name}
+                                    src={coverPhoto}
+                                    alt={item.jabatan}
                                     loading="lazy"
                                     className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
                                     onError={(e) => {

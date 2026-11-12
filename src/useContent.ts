@@ -45,6 +45,7 @@ function migrateStruktur(struktur: any[]): any[] {
     return {
       id: item.id || `st_${idx}`,
       jabatan: item.jabatan || '',
+      foto_bidang: item.foto_bidang || '', // <-- Tambahan
       members: newMembers.length > 0 ? newMembers : [{ name: '', nim: '', photo: '' }],
       urutan: item.urutan || idx + 1,
     };
