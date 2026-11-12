@@ -25,13 +25,19 @@ const IS_ADMIN_PAGE =
 function LoadingScreen() {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-dark-purple">
-      <div className="mb-8">
-        <span className="text-4xl font-extrabold tracking-tight">
-          <span className="bg-gradient-to-r from-primary-purple to-purple-300 bg-clip-text text-transparent">
-            KKN
-          </span>
-          <span className="text-white">.</span>
-        </span>
+      {/* Logo Loading Screen (Kotak luar, Bulat dalam) */}
+      <div className="mb-8 relative">
+        {/* Bingkai Kotak */}
+        <div className="w-28 h-28 bg-white/10 backdrop-blur-md rounded-[2rem] border border-white/20 shadow-2xl flex items-center justify-center p-2">
+          {/* Bingkai Bulat di dalamnya */}
+          <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner">
+            <img 
+              src="/images/logo.png" 
+              alt="Logo KKN" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+        </div>
       </div>
 
       <div className="relative w-16 h-16">
