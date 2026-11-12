@@ -84,15 +84,15 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Support By
             </h3>
-            {/* Menggunakan items-start agar sejajar dari atas */}
-            <div className="flex flex-wrap items-start justify-center gap-6 sm:gap-8">
+            {/* Menggunakan GRID agar sejajar sempurna */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
               {supportBy.map((partner) => (
                 <button
                   key={partner.id}
                   onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center gap-3 w-36 sm:w-40 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300 flex-shrink-0">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -103,7 +103,8 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 w-full text-center leading-tight line-clamp-2">
+                  {/* h-10 memaksa tinggi teks selalu sama (setara 2 baris) agar logo sejajar */}
+                  <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
                     {partner.nama}
                   </p>
                 </button>
@@ -116,15 +117,15 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Sponsor By
             </h3>
-            {/* Menggunakan items-start agar sejajar dari atas */}
-            <div className="flex flex-wrap items-start justify-center gap-6 sm:gap-8">
+            {/* Menggunakan GRID agar sejajar sempurna */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
               {sponsorBy.map((partner) => (
                 <button
                   key={partner.id}
                   onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center gap-3 w-36 sm:w-40 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center w-full max-w-[160px] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300 flex-shrink-0">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -135,7 +136,8 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 w-full text-center leading-tight line-clamp-2">
+                  {/* h-10 memaksa tinggi teks selalu sama (setara 2 baris) agar logo sejajar */}
+                  <p className="mt-3 text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 text-center leading-tight line-clamp-2 w-full flex items-start justify-center h-10">
                     {partner.nama}
                   </p>
                 </button>
