@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Target, Calendar, MapPin, Users } from 'lucide-react';
 import type { ProgramRow } from '../types';
 
@@ -8,10 +8,20 @@ interface ProgramModalProps {
 }
 
 export default function ProgramModal({ program, onClose }: ProgramModalProps) {
-  // Handle Escape key untuk close
+  // State untuk memicu animasi keluar (slide down + fade out)
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Beri jeda 300ms (sesuai durasi animasi) sebelum benar-benar ditutup
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleKey);
     document.body.classList.add('modal-open');
@@ -19,7 +29,7 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
       window.removeEventListener('keydown', handleKey);
       document.body.classList.remove('modal-open');
     };
-  }, [onClose]);
+  }, []);
 
   const infoItems = [
     { icon: Target, label: 'Sasaran', value: program.info?.sasaran || '-' },
@@ -30,11 +40,19 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-purple/70 backdrop-blur-sm animate-fade-in"
-      onClick={onClose}
+      // Background overlay juga ikut memudar
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-purple/70 backdrop-blur-sm transition-opacity duration-300 ${
+        isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+      }`}
+      onClick={handleClose}
     >
       <div
-        className="bg-bg dark:bg-dark-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up transition-colors"
+        // Modal kotak meluncur ke bawah (translate-y) dan memudar
+        className={`bg-bg dark:bg-dark-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-300 ${
+          isClosing 
+            ? 'opacity-0 translate-y-12' 
+            : 'opacity-100 translate-y-0 animate-slide-up'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -46,7 +64,7 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
             </h3>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all"
             aria-label="Close"
           >

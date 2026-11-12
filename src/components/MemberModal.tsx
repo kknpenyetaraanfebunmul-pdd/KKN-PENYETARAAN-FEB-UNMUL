@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X, User, Hash, Users } from 'lucide-react';
 import type { StrukturMember } from '../types';
 
@@ -9,11 +9,20 @@ interface MemberModalProps {
 }
 
 export default function MemberModal({ member, jabatan, onClose }: MemberModalProps) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -24,17 +33,21 @@ export default function MemberModal({ member, jabatan, onClose }: MemberModalPro
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-dark-purple/90 backdrop-blur-md animate-fade-in p-4"
-      onClick={onClose}
+      className={`fixed inset-0 z-[60] flex items-center justify-center bg-dark-purple/90 backdrop-blur-md p-4 transition-opacity duration-300 ${
+        isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+      }`}
+      onClick={handleClose}
     >
       <div
-        className="bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl animate-slide-up overflow-hidden transition-colors"
+        className={`bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden transition-all duration-300 ${
+          isClosing ? 'opacity-0 translate-y-12' : 'opacity-100 translate-y-0 animate-slide-up'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Foto Besar */}
         <div className="relative aspect-square bg-gradient-to-br from-primary-purple/20 to-primary-purple/5 dark:from-primary-purple/10 dark:to-transparent flex items-center justify-center overflow-hidden transition-colors">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 text-white bg-dark-purple/40 hover:bg-dark-purple/60 backdrop-blur-sm rounded-full p-2 transition-all z-10"
             aria-label="Close"
           >

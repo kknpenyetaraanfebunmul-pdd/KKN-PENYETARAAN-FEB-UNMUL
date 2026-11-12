@@ -45,15 +45,15 @@ body.modal-open {
   overflow: hidden;
 }
 
+/* Menyembunyikan scrollbar untuk Chrome, Safari, dan Opera */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--primary-purple);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
+
+/* Menyembunyikan scrollbar untuk IE, Edge, dan Firefox */
+html, body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 .gallery-scroll-bar::-webkit-scrollbar {

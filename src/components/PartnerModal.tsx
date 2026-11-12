@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { PartnerRow } from '../types';
 
@@ -8,9 +8,18 @@ interface PartnerModalProps {
 }
 
 export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleKey);
     document.body.classList.add('modal-open');
@@ -22,17 +31,21 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md animate-fade-in p-4"
-      onClick={onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md p-4 transition-opacity duration-300 ${
+        isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+      }`}
+      onClick={handleClose}
     >
       <div
-        className="bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl animate-slide-up overflow-hidden transition-colors duration-300"
+        className={`bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden transition-all duration-300 ${
+          isClosing ? 'opacity-0 translate-y-12' : 'opacity-100 translate-y-0 animate-slide-up'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="relative bg-gradient-to-br from-primary-purple to-primary-purple/80 p-6 text-center">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all"
             aria-label="Close"
           >

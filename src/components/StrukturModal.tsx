@@ -10,10 +10,18 @@ interface StrukturModalProps {
 
 export default function StrukturModal({ data, onClose }: StrukturModalProps) {
   const [selectedMember, setSelectedMember] = useState<StrukturMember | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // 300ms sesuai durasi transisi
+  };
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !selectedMember) onClose();
+      if (e.key === 'Escape' && !selectedMember) handleClose();
     };
     window.addEventListener('keydown', handleKey);
     document.body.classList.add('modal-open');
@@ -26,17 +34,21 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md animate-fade-in p-3 sm:p-4 overflow-y-auto"
-        onClick={onClose}
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto transition-opacity duration-300 ${
+          isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+        }`}
+        onClick={handleClose}
       >
         <div
-          className="bg-bg dark:bg-dark-card rounded-2xl sm:rounded-3xl max-w-3xl w-full my-4 sm:my-8 shadow-2xl animate-slide-up overflow-hidden transition-colors duration-300"
+          className={`bg-bg dark:bg-dark-card rounded-2xl sm:rounded-3xl max-w-3xl w-full my-4 sm:my-8 shadow-2xl overflow-hidden transition-all duration-300 ${
+            isClosing ? 'opacity-0 translate-y-12' : 'opacity-100 translate-y-0 animate-slide-up'
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="relative bg-gradient-to-br from-primary-purple to-primary-purple/80 p-5 sm:p-8 text-center">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="absolute top-3 right-3 sm:top-4 sm:right-4 text-white/80 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all"
               aria-label="Close"
             >

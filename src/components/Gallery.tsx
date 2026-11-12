@@ -9,6 +9,7 @@ interface GalleryProps {
 
 export default function Gallery({ content }: GalleryProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [isLightboxClosing, setIsLightboxClosing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -19,7 +20,13 @@ export default function Gallery({ content }: GalleryProps) {
     hasDragged: false,
   });
 
-  const closeLightbox = useCallback(() => setLightbox(null), []);
+  const closeLightbox = useCallback(() => {
+    setIsLightboxClosing(true);
+    setTimeout(() => {
+      setLightbox(null);
+      setIsLightboxClosing(false);
+    }, 300);
+  }, []);
   const nextImage = useCallback(() => {
     setLightbox((prev) => {
       if (prev === null) return prev;
@@ -288,7 +295,9 @@ export default function Gallery({ content }: GalleryProps) {
       {/* LIGHTBOX */}
       {lightbox !== null && content[lightbox] && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/95 backdrop-blur-md animate-fade-in p-4"
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/95 backdrop-blur-md p-4 transition-opacity duration-300 ${
+            isLightboxClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+          }`}
           onClick={closeLightbox}
         >
           <button
@@ -320,7 +329,9 @@ export default function Gallery({ content }: GalleryProps) {
           </button>
 
           <div
-            className="max-w-4xl w-full max-h-[85vh] flex flex-col items-center"
+            className={`max-w-4xl w-full max-h-[85vh] flex flex-col items-center transition-all duration-300 ${
+              isLightboxClosing ? 'opacity-0 translate-y-12 scale-95' : 'opacity-100 translate-y-0 scale-100'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             {content[lightbox].tipe === 'video' ? (
