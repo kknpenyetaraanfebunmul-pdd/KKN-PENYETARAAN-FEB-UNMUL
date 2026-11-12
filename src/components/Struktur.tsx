@@ -1,8 +1,8 @@
-import Reveal from './Reveal';
 import { useState } from 'react';
 import type { SiteContent } from '../types';
 import { Users, FileText, Wallet, Megaphone, Camera, Package } from 'lucide-react';
 import StrukturModal from './StrukturModal';
+import Reveal from './Reveal';
 
 const iconMap: Record<string, typeof Users> = {
   Ketua: Users,
@@ -64,87 +64,102 @@ export default function Struktur({ content }: StrukturProps) {
                 )}
                 <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center items-center lg:items-stretch gap-4 sm:gap-8 w-full">
                   {row.map(({ item, idx }, rowIdx) => {
-            const Icon = iconMap[item.jabatan] || Users;
-            const photos = (item.members || [])
-              .filter((m) => m.photo)
-              .slice(0, 1);
-            return (
-              <Reveal 
-                key={item.id} 
-                delay={idx * 150} 
-                direction={
-                  row.length === 1 ? 'up' : 
-                  row.length === 3 ? (rowIdx === 0 ? 'left' : rowIdx === 1 ? 'up' : 'right') : 
-                  (rowIdx % 2 === 0 ? 'left' : 'right')
-                } 
-                className="w-full max-w-sm lg:max-w-none lg:w-72 xl:w-80"
-              >
-              <button
-                key={item.id}
-                onClick={() => setSelectedIndex(idx)}
-                className="group relative bg-white dark:bg-dark-card rounded-2xl sm:rounded-3xl text-center transition-shadow duration-300 hover:shadow-2xl border border-bubble-light dark:border-dark-border overflow-hidden flex flex-col h-full cursor-pointer w-full sm:w-72 lg:w-80"
-                style={{
-                  animation: `fadeIn 0.5s ease ${idx * 0.1}s both`,
-                }}
-              >
-                {/* Efek Background saat Hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/0 to-primary-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    const Icon = iconMap[item.jabatan] || Users;
+                    const photos = (item.members || [])
+                      .filter((m) => m.photo)
+                      .slice(0, 1);
 
-                <div className="relative z-10 flex flex-col items-center flex-grow w-full">
-                  {/* Foto Cover / Avatar (Desain Full Banner) */}
-                  <div className="w-full relative flex-shrink-0">
-                    {photos.length > 0 ? (
-                      <div className="w-full h-48 sm:h-56 overflow-hidden relative">
-                        <img
-                          src={photos[0].photo}
-                          alt={photos[0].name}
-                          loading="lazy"
-                          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                        {/* Overlay Gradasi Solid dengan Masking */}
-                        <div className="absolute bottom-0 left-0 right-0 h-24 bg-white dark:bg-dark-card pointer-events-none transition-colors duration-300" style={{ maskImage: 'linear-gradient(to top, black 0%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to top, black 0%, transparent 100%)' }} />
-                      </div>
-                    ) : (
-                      <div className="w-full h-48 sm:h-56 bg-primary-purple/5 flex items-center justify-center transition-all duration-300 group-hover:bg-primary-purple">
-                        <Icon
-                          size={48}
-                          className="text-primary-purple/60 transition-colors duration-300 group-hover:text-white"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Container Teks (Padding dipindah ke sini) */}
-                  <div className="px-5 pb-6 pt-4 flex flex-col flex-grow w-full">
-                    {/* Teks Jabatan */}
-                    <h3 className="text-base sm:text-xl font-bold text-dark-purple dark:text-dark-text mb-3 sm:mb-4 transition-colors break-words px-1">
-                      {item.jabatan}
-                    </h3>
-
-                    {/* DAFTAR NAMA */}
-                    <ul className="space-y-1 sm:space-y-1.5 flex-grow w-full px-1">
-                      {(item.members || []).map((member, i) => (
-                        <li
-                          key={i}
-                          className="text-xs sm:text-sm text-dark-purple/70 dark:text-dark-text-muted font-medium leading-snug sm:leading-relaxed transition-colors break-words"
+                    return (
+                      <Reveal
+                        key={item.id}
+                        delay={idx * 150}
+                        direction={
+                          row.length === 1
+                            ? 'up'
+                            : row.length === 3
+                            ? rowIdx === 0
+                              ? 'left'
+                              : rowIdx === 1
+                              ? 'up'
+                              : 'right'
+                            : rowIdx % 2 === 0
+                            ? 'left'
+                            : 'right'
+                        }
+                        className="w-full max-w-sm lg:max-w-none lg:w-72 xl:w-80 mx-auto"
+                      >
+                        <button
+                          key={item.id}
+                          onClick={() => setSelectedIndex(idx)}
+                          className="group relative bg-white dark:bg-dark-card rounded-2xl sm:rounded-3xl text-center transition-shadow duration-300 hover:shadow-2xl border border-bubble-light dark:border-dark-border overflow-hidden flex flex-col h-full cursor-pointer w-full"
                         >
-                          {member.name}
-                        </li>
-                      ))}
-                    </ul>
+                          {/* Efek Background saat Hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/0 to-primary-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                    {/* Garis Aksen Kecil di Bawah */}
-                    <div className="mt-auto pt-4 sm:pt-6 w-full flex justify-center">
-                      <div className="w-8 h-1 bg-primary-purple/20 rounded-full transition-all duration-300 group-hover:w-16 group-hover:bg-primary-purple/60" />
-                    </div>
-                  </div>
-                </div>
-              </button>
-              </Reveal>
-            );
+                          <div className="relative z-10 flex flex-col items-center flex-grow w-full">
+                            {/* Foto Cover / Avatar (Desain Full Banner) */}
+                            <div className="w-full relative flex-shrink-0">
+                              {photos.length > 0 ? (
+                                <div className="w-full h-48 sm:h-56 overflow-hidden relative">
+                                  <img
+                                    src={photos[0].photo}
+                                    alt={photos[0].name}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display =
+                                        'none';
+                                    }}
+                                  />
+                                  {/* Overlay Gradasi Solid dengan Masking */}
+                                  <div
+                                    className="absolute bottom-0 left-0 right-0 h-24 bg-white dark:bg-dark-card pointer-events-none transition-colors duration-300"
+                                    style={{
+                                      maskImage:
+                                        'linear-gradient(to top, black 0%, transparent 100%)',
+                                      WebkitMaskImage:
+                                        'linear-gradient(to top, black 0%, transparent 100%)',
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-full h-48 sm:h-56 bg-primary-purple/5 flex items-center justify-center transition-all duration-300 group-hover:bg-primary-purple">
+                                  <Icon
+                                    size={48}
+                                    className="text-primary-purple/60 transition-colors duration-300 group-hover:text-white"
+                                  />
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Container Teks */}
+                            <div className="px-5 pb-6 pt-4 flex flex-col flex-grow w-full">
+                              {/* Teks Jabatan */}
+                              <h3 className="text-base sm:text-xl font-bold text-dark-purple dark:text-dark-text mb-3 sm:mb-4 transition-colors break-words px-1">
+                                {item.jabatan}
+                              </h3>
+
+                              {/* DAFTAR NAMA */}
+                              <ul className="space-y-1 sm:space-y-1.5 flex-grow w-full px-1">
+                                {(item.members || []).map((member, i) => (
+                                  <li
+                                    key={i}
+                                    className="text-xs sm:text-sm text-dark-purple/70 dark:text-dark-text-muted font-medium leading-snug sm:leading-relaxed transition-colors break-words"
+                                  >
+                                    {member.name}
+                                  </li>
+                                ))}
+                              </ul>
+
+                              {/* Garis Aksen Kecil di Bawah */}
+                              <div className="mt-auto pt-4 sm:pt-6 w-full flex justify-center">
+                                <div className="w-8 h-1 bg-primary-purple/20 rounded-full transition-all duration-300 group-hover:w-16 group-hover:bg-primary-purple/60" />
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      </Reveal>
+                    );
                   })}
                 </div>
               </div>
