@@ -62,7 +62,7 @@ export default function Struktur({ content }: StrukturProps) {
                 {lv > 0 && (
                   <div className="w-px h-8 sm:h-12 bg-primary-purple/30" />
                 )}
-                <div className="flex flex-wrap justify-center gap-4 sm:gap-8 items-stretch w-full">
+                <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center items-center lg:items-stretch gap-4 sm:gap-8 w-full">
                   {row.map(({ item, idx }, rowIdx) => {
             const Icon = iconMap[item.jabatan] || Users;
             const photos = (item.members || [])
@@ -77,7 +77,7 @@ export default function Struktur({ content }: StrukturProps) {
                   row.length === 3 ? (rowIdx === 0 ? 'left' : rowIdx === 1 ? 'up' : 'right') : 
                   (rowIdx % 2 === 0 ? 'left' : 'right')
                 } 
-                className="w-full sm:w-72 lg:w-80"
+                className="w-full max-w-sm lg:max-w-none lg:w-72 xl:w-80"
               >
               <button
                 key={item.id}
