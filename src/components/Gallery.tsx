@@ -54,9 +54,11 @@ export default function Gallery({ content }: GalleryProps) {
       if (e.key === 'ArrowLeft') prevImage();
     };
     window.addEventListener('keydown', handleKey);
+    document.documentElement.classList.add('modal-open');
     document.body.classList.add('modal-open');
     return () => {
       window.removeEventListener('keydown', handleKey);
+      document.documentElement.classList.remove('modal-open');
       document.body.classList.remove('modal-open');
     };
   }, [lightbox, closeLightbox, nextImage, prevImage]);

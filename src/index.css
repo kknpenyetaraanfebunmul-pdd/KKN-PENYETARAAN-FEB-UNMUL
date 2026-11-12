@@ -41,8 +41,11 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
-body.modal-open {
+/* Mengunci scroll pada html dan body, serta mematikan efek bounce di iOS */
+html.modal-open, body.modal-open {
   overflow: hidden;
+  overscroll-behavior: none; 
+  height: 100%;
 }
 
 /* Menyembunyikan scrollbar untuk Chrome, Safari, dan Opera */

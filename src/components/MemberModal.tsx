@@ -13,6 +13,7 @@ export default function MemberModal({ member, jabatan, onClose }: MemberModalPro
 
   useEffect(() => {
     setIsVisible(true);
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
@@ -20,10 +21,17 @@ export default function MemberModal({ member, jabatan, onClose }: MemberModalPro
       }
     };
     window.addEventListener('keydown', handleKey);
+    
+    // Kunci scroll di html & body
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+
     return () => {
       window.removeEventListener('keydown', handleKey);
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
     };
-  }, [onClose]);
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -65,7 +73,7 @@ export default function MemberModal({ member, jabatan, onClose }: MemberModalPro
             <User size={96} className="text-primary-purple/40" />
           )}
 
-          {/* Gradient overlay: menyesuaikan warna background modal */}
+          {/* Gradient overlay */}
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-bg dark:from-dark-card to-transparent transition-colors" />
         </div>
 

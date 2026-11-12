@@ -14,16 +14,22 @@ export default function StrukturModal({ data, onClose }: StrukturModalProps) {
 
   useEffect(() => {
     setIsVisible(true);
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !selectedMember) handleClose();
     };
     window.addEventListener('keydown', handleKey);
+    
+    // Kunci scroll di html & body
+    document.documentElement.classList.add('modal-open');
     document.body.classList.add('modal-open');
+    
     return () => {
       window.removeEventListener('keydown', handleKey);
+      document.documentElement.classList.remove('modal-open');
       document.body.classList.remove('modal-open');
     };
-  }, [onClose, selectedMember]);
+  }, [selectedMember]);
 
   const handleClose = () => {
     setIsVisible(false);

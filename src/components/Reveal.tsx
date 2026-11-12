@@ -18,8 +18,8 @@ export default function Reveal({ children, delay = 0, direction = 'up', classNam
         setIsVisible(entry.isIntersecting);
       },
       {
-        threshold: 0.1, // Muncul saat 10% elemen terlihat
-        rootMargin: '0px 0px -5% 0px'
+        threshold: 0,
+        rootMargin: '0px 0px 50px 0px' // Muncul 50px sebelum masuk layar
       }
     );
 
