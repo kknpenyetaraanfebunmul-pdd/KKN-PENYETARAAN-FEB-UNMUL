@@ -63,13 +63,22 @@ export default function Struktur({ content }: StrukturProps) {
                   <div className="w-px h-8 sm:h-12 bg-primary-purple/30" />
                 )}
                 <div className="flex flex-wrap justify-center gap-4 sm:gap-8 items-stretch w-full">
-                  {row.map(({ item, idx }) => {
+                  {row.map(({ item, idx }, rowIdx) => {
             const Icon = iconMap[item.jabatan] || Users;
             const photos = (item.members || [])
               .filter((m) => m.photo)
               .slice(0, 1);
             return (
-              <Reveal key={item.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="w-full sm:w-72 lg:w-80">
+              <Reveal 
+                key={item.id} 
+                delay={idx * 150} 
+                direction={
+                  row.length === 1 ? 'up' : 
+                  row.length === 3 ? (rowIdx === 0 ? 'left' : rowIdx === 1 ? 'up' : 'right') : 
+                  (rowIdx % 2 === 0 ? 'left' : 'right')
+                } 
+                className="w-full sm:w-72 lg:w-80"
+              >
               <button
                 key={item.id}
                 onClick={() => setSelectedIndex(idx)}

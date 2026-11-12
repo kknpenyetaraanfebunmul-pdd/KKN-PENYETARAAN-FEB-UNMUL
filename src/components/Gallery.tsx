@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, Play, Instagram } from 'lucide-react';
 import type { SiteContent } from '../types';
+import Reveal from './Reveal';
 
 interface GalleryProps {
   content: SiteContent['gallery'];
@@ -178,6 +179,7 @@ export default function Gallery({ content }: GalleryProps) {
         }
       `}</style>
 
+      <Reveal direction="right" className="w-full block">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
         <div className="text-center mb-14">
           <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
@@ -280,6 +282,8 @@ export default function Gallery({ content }: GalleryProps) {
           </div>
         </div>
       </div>
+
+      </Reveal>
 
       {/* LIGHTBOX */}
       {lightbox !== null && content[lightbox] && (

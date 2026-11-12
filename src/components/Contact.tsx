@@ -52,7 +52,15 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         {/* CONTACT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
           {contacts.map((contact, idx) => (
-            <Reveal key={contact.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="w-full h-full">
+            <Reveal 
+              key={contact.id} 
+              delay={idx * 150} 
+              direction={
+                contacts.length === 3 ? (idx === 0 ? 'left' : idx === 1 ? 'up' : 'right') : 
+                (idx % 2 === 0 ? 'left' : 'right')
+              } 
+              className="w-full h-full"
+            >
               <a
                 href={contact.url}
                 target="_blank"
