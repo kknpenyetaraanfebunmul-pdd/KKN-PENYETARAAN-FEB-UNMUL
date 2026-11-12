@@ -57,22 +57,22 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
               className="group bg-card-bg dark:bg-dark-card rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light dark:border-dark-border"
               style={{ animation: `fadeIn 0.5s ease ${idx * 0.1}s both` }}
             >
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary-purple/10 text-primary-purple transition-all duration-300 group-hover:bg-primary-purple group-hover:text-white">
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-primary-purple/10 text-primary-purple transition-all duration-300 group-hover:bg-primary-purple group-hover:text-white">
                   {platformIcons[contact.platform] || platformIcons.Email}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors duration-300">
                     {contact.platform}
                   </p>
-                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors duration-300">
+                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors duration-300 truncate">
                     {contact.value}
                   </p>
                 </div>
               </div>
               <ArrowRight
                 size={20}
-                className="text-primary-purple/40 transition-all duration-300 group-hover:text-primary-purple group-hover:translate-x-1"
+                className="flex-shrink-0 text-primary-purple/40 transition-all duration-300 group-hover:text-primary-purple group-hover:translate-x-1 ml-2"
               />
             </a>
           ))}

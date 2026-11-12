@@ -139,7 +139,7 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen bg-bg dark:bg-dark-bg transition-colors duration-500">
+    <div className="min-h-screen w-full overflow-x-hidden bg-bg dark:bg-dark-bg transition-colors duration-500">
       <Header activeSection={activeSection} visible={!showDock} />
 
       <main>
