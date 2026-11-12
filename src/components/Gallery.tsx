@@ -9,7 +9,7 @@ interface GalleryProps {
 
 export default function Gallery({ content }: GalleryProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [isLightboxClosing, setIsLightboxClosing] = useState(false);
+  const [isLightboxVisible, setIsLightboxVisible] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -21,12 +21,18 @@ export default function Gallery({ content }: GalleryProps) {
   });
 
   const closeLightbox = useCallback(() => {
-    setIsLightboxClosing(true);
+    setIsLightboxVisible(false);
     setTimeout(() => {
       setLightbox(null);
-      setIsLightboxClosing(false);
     }, 300);
   }, []);
+
+  useEffect(() => {
+    if (lightbox !== null) {
+      // Beri sedikit jeda agar transisi masuk terpicu
+      setTimeout(() => setIsLightboxVisible(true), 10);
+    }
+  }, [lightbox]);
   const nextImage = useCallback(() => {
     setLightbox((prev) => {
       if (prev === null) return prev;
@@ -296,7 +302,7 @@ export default function Gallery({ content }: GalleryProps) {
       {lightbox !== null && content[lightbox] && (
         <div
           className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/95 backdrop-blur-md p-4 transition-opacity duration-300 ${
-            isLightboxClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+            isLightboxVisible ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={closeLightbox}
         >
@@ -330,7 +336,7 @@ export default function Gallery({ content }: GalleryProps) {
 
           <div
             className={`max-w-4xl w-full max-h-[85vh] flex flex-col items-center transition-all duration-300 ${
-              isLightboxClosing ? 'opacity-0 translate-y-12 scale-95' : 'opacity-100 translate-y-0 scale-100'
+              isLightboxVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
             }`}
             onClick={(e) => e.stopPropagation()}
           >

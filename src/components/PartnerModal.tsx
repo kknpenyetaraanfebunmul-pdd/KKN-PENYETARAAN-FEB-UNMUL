@@ -8,16 +8,10 @@ interface PartnerModalProps {
 }
 
 export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
-  const [isClosing, setIsClosing] = useState(false);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(true);
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
@@ -27,18 +21,28 @@ export default function PartnerModal({ partner, onClose }: PartnerModalProps) {
       window.removeEventListener('keydown', handleKey);
       document.body.classList.remove('modal-open');
     };
-  }, [onClose]);
+  const [isVisible, setIsVisible] = useState(false);
 
-  return (
+  useEffect(() =  }, [onClose]);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  return (> {
+    setIsVisible(true);
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-dark-purple/80 backdrop-blur-md p-4 transition-opacity duration-300 ${
-        isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleClose}
     >
       <div
         className={`bg-bg dark:bg-dark-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden transition-all duration-300 ${
-          isClosing ? 'opacity-0 translate-y-12' : 'opacity-100 translate-y-0 animate-slide-up'
+          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
         }`}
         onClick={(e) => e.stopPropagation()}
       >

@@ -8,18 +8,13 @@ interface ProgramModalProps {
 }
 
 export default function ProgramModal({ program, onClose }: ProgramModalProps) {
-  // State untuk memicu animasi keluar (slide down + fade out)
-  const [isClosing, setIsClosing] = useState(false);
-
-  const handleClose = () => {
-    setIsClosing(true);
-    // Beri jeda 300ms (sesuai durasi animasi) sebelum benar-benar ditutup
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+  // Menggunakan isVisible agar transisi masuk & keluar mulus
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Memicu animasi masuk sesaat setelah komponen dirender
+    setIsVisible(true);
+
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
@@ -31,6 +26,13 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
     };
   }, []);
 
+  const handleClose = () => {
+    setIsVisible(false); // Memicu animasi keluar
+    setTimeout(() => {
+      onClose(); // Benar-benar dihapus dari layar setelah 300ms
+    }, 300);
+  };
+
   const infoItems = [
     { icon: Target, label: 'Sasaran', value: program.info?.sasaran || '-' },
     { icon: Calendar, label: 'Jadwal', value: program.info?.jadwal || '-' },
@@ -40,18 +42,14 @@ export default function ProgramModal({ program, onClose }: ProgramModalProps) {
 
   return (
     <div
-      // Background overlay juga ikut memudar
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-purple/70 backdrop-blur-sm transition-opacity duration-300 ${
-        isClosing ? 'opacity-0' : 'opacity-100 animate-fade-in'
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleClose}
     >
       <div
-        // Modal kotak meluncur ke bawah (translate-y) dan memudar
         className={`bg-bg dark:bg-dark-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-300 ${
-          isClosing 
-            ? 'opacity-0 translate-y-12' 
-            : 'opacity-100 translate-y-0 animate-slide-up'
+          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
