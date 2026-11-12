@@ -65,7 +65,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   <p className="text-xs text-dark-purple/50 dark:text-dark-text-muted font-medium uppercase tracking-wide transition-colors duration-300">
                     {contact.platform}
                   </p>
-                  <p className="text-dark-purple dark:text-dark-text font-semibold text-sm transition-colors duration-300 truncate">
+                  <p className="text-dark-purple dark:text-dark-text font-semibold text-xs sm:text-sm transition-colors duration-300 break-words leading-tight">
                     {contact.value}
                   </p>
                 </div>
@@ -103,7 +103,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[160px] text-center leading-tight line-clamp-2">
                     {partner.nama}
                   </p>
                 </button>
@@ -135,7 +135,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[160px] text-center leading-tight line-clamp-2">
                     {partner.nama}
                   </p>
                 </button>
