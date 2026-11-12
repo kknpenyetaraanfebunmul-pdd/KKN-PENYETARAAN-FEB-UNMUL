@@ -1,180 +1,130 @@
-import { useState } from 'react';
-import type { SiteContent } from '../types';
-import { Users, FileText, Wallet, Megaphone, Camera, Package } from 'lucide-react';
-import StrukturModal from './StrukturModal';
-import Reveal from './Reveal';
+import { useEffect, useState } from 'react';
+import { X, Target, Calendar, MapPin, Users } from 'lucide-react';
+import type { ProgramRow } from '../types';
 
-const iconMap: Record<string, typeof Users> = {
-  Ketua: Users,
-  Sekretaris: FileText,
-  Bendahara: Wallet,
-  Humas: Megaphone,
-  PDD: Camera,
-  Perdek: Package,
-};
-
-interface StrukturProps {
-  content: SiteContent['struktur'];
+interface ProgramModalProps {
+  program: ProgramRow;
+  onClose: () => void;
 }
 
-export default function Struktur({ content }: StrukturProps) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+export default function ProgramModal({ program, onClose }: ProgramModalProps) {
+  const [isVisible, setIsVisible] = useState(false);
 
-  // Kelompokkan jadi 3 level hierarki (index asli dipertahankan untuk modal)
-  const indexed = content.map((item, idx) => ({ item, idx }));
-  const levelOf = (jabatan: string) =>
-    jabatan === 'Ketua'
-      ? 0
-      : jabatan === 'Sekretaris' || jabatan === 'Bendahara'
-      ? 1
-      : 2;
-  const levels = [0, 1, 2].map((lv) =>
-    indexed.filter(({ item }) => levelOf(item.jabatan) === lv)
-  );
+  useEffect(() => {
+    setIsVisible(true);
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+    
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
+    };
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  if (!program) return null; // Mencegah crash total jika data hilang
+
+  // Pengaman untuk array kegiatan dan objek info
+  const safeKegiatan = Array.isArray(program.kegiatan) ? program.kegiatan : [];
+  const safeInfo = program.info || { sasaran: '', jadwal: '', lokasi: '', target: '' };
+
+  const infoItems = [
+    { icon: Target, label: 'Sasaran', value: safeInfo.sasaran || '-' },
+    { icon: Calendar, label: 'Jadwal', value: safeInfo.jadwal || '-' },
+    { icon: MapPin, label: 'Lokasi', value: safeInfo.lokasi || '-' },
+    { icon: Users, label: 'Peserta/Target/Layanan', value: safeInfo.target || '-' },
+  ];
 
   return (
-    <section
-      id="struktur"
-      className="py-20 sm:py-28 px-4 sm:px-8 relative bg-white dark:bg-dark-bg transition-colors duration-300 overflow-hidden"
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-purple/70 backdrop-blur-sm transition-opacity duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+      onClick={handleClose}
     >
-      <div className="max-w-6xl mx-auto">
-        {/* Header Section */}
-        <Reveal>
-          <div className="text-center mb-12 sm:mb-16 px-2">
-            <p className="text-primary-purple font-semibold text-xs sm:text-sm tracking-widest uppercase mb-3">
-              Tim Kami
-            </p>
-            <h2 className="text-2xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors break-words">
-              Struktur KKN
-            </h2>
-            <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
-            <p className="text-xs sm:text-sm text-dark-purple/50 dark:text-dark-text-muted mt-4 transition-colors">
-              Klik salah satu kartu untuk melihat detail anggota
-            </p>
+      <div
+        className={`bg-bg dark:bg-dark-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-300 ${
+          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-gradient-to-r from-primary-purple to-dark-purple px-6 sm:px-8 py-6 flex items-start justify-between rounded-t-3xl z-10">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">{program.icon || '📌'}</span>
+            <h3 className="text-2xl font-extrabold text-white">
+              {program.judul || 'Tanpa Judul'}
+            </h3>
           </div>
-        </Reveal>
+          <button
+            onClick={handleClose}
+            className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-        {/* Grid Cards */}
-        <div className="flex flex-col items-center">
-          {levels.map((row, lv) =>
-            row.length === 0 ? null : (
-              <div key={lv} className="flex flex-col items-center w-full">
-                {lv > 0 && (
-                  <div className="w-px h-8 sm:h-12 bg-primary-purple/30" />
-                )}
-                <div className="flex flex-col lg:flex-row lg:flex-wrap justify-center items-center lg:items-stretch gap-4 sm:gap-8 w-full">
-                  {row.map(({ item, idx }, rowIdx) => {
-                    const Icon = iconMap[item.jabatan] || Users;
-                    const photos = (item.members || [])
-                      .filter((m) => m.photo)
-                      .slice(0, 1);
+        <div className="p-6 sm:p-8">
+          <p className="text-dark-purple/80 dark:text-dark-text-muted leading-relaxed mb-8 transition-colors">
+            {program.deskripsi_lengkap || 'Belum ada deskripsi lengkap.'}
+          </p>
 
-                    return (
-                      <Reveal
-                        key={item.id}
-                        delay={idx * 150}
-                        direction={
-                          row.length === 1
-                            ? 'up'
-                            : row.length === 3
-                            ? rowIdx === 0
-                              ? 'left'
-                              : rowIdx === 1
-                              ? 'up'
-                              : 'right'
-                            : rowIdx % 2 === 0
-                            ? 'left'
-                            : 'right'
-                        }
-                        className="w-full max-w-sm lg:max-w-none lg:w-72 xl:w-80 flex justify-center"
-                      >
-                        <button
-                          key={item.id}
-                          onClick={() => setSelectedIndex(idx)}
-                          className="group relative bg-white dark:bg-dark-card rounded-2xl sm:rounded-3xl text-center transition-shadow duration-300 hover:shadow-2xl border border-bubble-light dark:border-dark-border overflow-hidden flex flex-col h-full cursor-pointer w-full"
-                        >
-                          {/* Efek Background saat Hover */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/0 to-primary-purple/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <h4 className="text-lg font-bold text-dark-purple dark:text-dark-text mb-4 flex items-center gap-2 transition-colors">
+            <span className="w-1.5 h-6 bg-primary-purple rounded-full" />
+            Kegiatan Utama
+          </h4>
+          <ol className="space-y-3 mb-8">
+            {safeKegiatan.map((activity, idx) => (
+              <li key={idx} className="flex items-start gap-3 bg-card-bg dark:bg-dark-bg rounded-xl p-3 transition-colors">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-purple text-white text-sm font-bold flex items-center justify-center">
+                  {idx + 1}
+                </span>
+                <span className="text-sm text-dark-purple/80 dark:text-dark-text-muted pt-0.5 transition-colors">
+                  {activity}
+                </span>
+              </li>
+            ))}
+            {safeKegiatan.length === 0 && (
+              <p className="text-sm text-dark-purple/50 italic">Belum ada kegiatan yang diisi.</p>
+            )}
+          </ol>
 
-                          <div className="relative z-10 flex flex-col items-center flex-grow w-full">
-                            {/* Foto Cover / Avatar (Desain Full Banner) */}
-                            <div className="w-full relative flex-shrink-0">
-                              {photos.length > 0 ? (
-                                <div className="w-full h-48 sm:h-56 overflow-hidden relative">
-                                  <img
-                                    src={photos[0].photo}
-                                    alt={photos[0].name}
-                                    loading="lazy"
-                                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display =
-                                        'none';
-                                    }}
-                                  />
-                                  {/* Overlay Gradasi Solid dengan Masking */}
-                                  <div
-                                    className="absolute bottom-0 left-0 right-0 h-24 bg-white dark:bg-dark-card pointer-events-none transition-colors duration-300"
-                                    style={{
-                                      maskImage:
-                                        'linear-gradient(to top, black 0%, transparent 100%)',
-                                      WebkitMaskImage:
-                                        'linear-gradient(to top, black 0%, transparent 100%)',
-                                    }}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="w-full h-48 sm:h-56 bg-primary-purple/5 flex items-center justify-center transition-all duration-300 group-hover:bg-primary-purple">
-                                  <Icon
-                                    size={48}
-                                    className="text-primary-purple/60 transition-colors duration-300 group-hover:text-white"
-                                  />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Container Teks */}
-                            <div className="px-5 pb-6 pt-4 flex flex-col flex-grow w-full">
-                              {/* Teks Jabatan */}
-                              <h3 className="text-base sm:text-xl font-bold text-dark-purple dark:text-dark-text mb-3 sm:mb-4 transition-colors break-words px-1">
-                                {item.jabatan}
-                              </h3>
-
-                              {/* DAFTAR NAMA */}
-                              <ul className="space-y-1 sm:space-y-1.5 flex-grow w-full px-1">
-                                {(item.members || []).map((member, i) => (
-                                  <li
-                                    key={i}
-                                    className="text-xs sm:text-sm text-dark-purple/70 dark:text-dark-text-muted font-medium leading-snug sm:leading-relaxed transition-colors break-words"
-                                  >
-                                    {member.name}
-                                  </li>
-                                ))}
-                              </ul>
-
-                              {/* Garis Aksen Kecil di Bawah */}
-                              <div className="mt-auto pt-4 sm:pt-6 w-full flex justify-center">
-                                <div className="w-8 h-1 bg-primary-purple/20 rounded-full transition-all duration-300 group-hover:w-16 group-hover:bg-primary-purple/60" />
-                              </div>
-                            </div>
-                          </div>
-                        </button>
-                      </Reveal>
-                    );
-                  })}
+          <h4 className="text-lg font-bold text-dark-purple dark:text-dark-text mb-4 flex items-center gap-2 transition-colors">
+            <span className="w-1.5 h-6 bg-primary-purple rounded-full" />
+            Informasi Program
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {infoItems.map((info) => {
+              const Icon = info.icon;
+              return (
+                <div key={info.label} className="bg-card-bg dark:bg-dark-bg rounded-2xl p-4 border border-bubble-light dark:border-dark-border transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon size={18} className="text-primary-purple" />
+                    <span className="text-xs font-semibold text-primary-purple uppercase tracking-wide">
+                      {info.label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-dark-purple/80 dark:text-dark-text-muted transition-colors">
+                    {info.value}
+                  </p>
                 </div>
-              </div>
-            )
-          )}
+              );
+            })}
+          </div>
         </div>
       </div>
-
-      {/* MODAL */}
-      {selectedIndex !== null && content[selectedIndex] && (
-        <StrukturModal
-          data={content[selectedIndex]}
-          onClose={() => setSelectedIndex(null)}
-        />
-      )}
-    </section>
+    </div>
   );
 }
