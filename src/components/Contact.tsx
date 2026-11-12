@@ -40,10 +40,10 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         <Reveal direction="up">
           <div className="text-center mb-14">
             <p className="text-primary-purple font-semibold text-sm tracking-widest uppercase mb-3">
-              Hubungi Kami
+              Sosial Media
             </p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-dark-purple dark:text-dark-text mb-4 transition-colors duration-300">
-              Punya Pertanyaan? Ayo Bicara!
+              Kamu Bisa Kepoin Kami disini
             </h2>
             <div className="w-20 h-1.5 bg-primary-purple rounded-full mx-auto" />
           </div>
