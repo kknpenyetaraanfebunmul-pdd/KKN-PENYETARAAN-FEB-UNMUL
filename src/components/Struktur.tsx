@@ -69,7 +69,7 @@ export default function Struktur({ content }: StrukturProps) {
               .filter((m) => m.photo)
               .slice(0, 1);
             return (
-              <Reveal key={item.id} delay={idx * 150} direction="up" className="w-full sm:w-72 lg:w-80">
+              <Reveal key={item.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="w-full sm:w-72 lg:w-80">
               <button
                 key={item.id}
                 onClick={() => setSelectedIndex(idx)}

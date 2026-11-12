@@ -1,3 +1,4 @@
+import Reveal from './Reveal';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { SiteContent, PartnerRow } from '../types';
@@ -49,9 +50,10 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
         {/* CONTACT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
           {contacts.map((contact, idx) => (
-            <a
-              key={contact.id}
-              href={contact.url}
+            <Reveal key={contact.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="w-full h-full">
+              <a
+                key={contact.id}
+                href={contact.url}
               target="_blank"
               rel="noopener noreferrer"
               className="group bg-card-bg dark:bg-dark-card rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-bubble-light dark:border-dark-border"
@@ -86,7 +88,8 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             </h3>
             {/* Menggunakan GRID agar sejajar sempurna */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center">
-              {supportBy.map((partner) => (
+              {supportBy.map((partner, idx) => (
+                <Reveal key={partner.id} delay={idx * 100} direction={idx % 2 === 0 ? 'left' : 'right'}>
                 <button
                   key={partner.id}
                   onClick={() => setSelectedPartner(partner)}

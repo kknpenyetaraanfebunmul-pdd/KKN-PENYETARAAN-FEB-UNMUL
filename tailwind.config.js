@@ -53,11 +53,11 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
         revealLeft: {
-          '0%': { opacity: '0', transform: 'translateX(-40px) scale(0.98)' },
+          '0%': { opacity: '0', transform: 'translateX(-80px) scale(0.98)' },
           '100%': { opacity: '1', transform: 'translateX(0) scale(1)' },
         },
         revealRight: {
-          '0%': { opacity: '0', transform: 'translateX(40px) scale(0.98)' },
+          '0%': { opacity: '0', transform: 'translateX(80px) scale(0.98)' },
           '100%': { opacity: '1', transform: 'translateX(0) scale(1)' },
         },
       },

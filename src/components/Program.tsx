@@ -35,7 +35,7 @@ export default function Program({ content }: ProgramProps) {
         {/* Grid Program */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 items-stretch">
           {content.map((program, idx) => (
-            <Reveal key={program.id} delay={idx * 150} direction="up" className="h-full w-full flex">
+            <Reveal key={program.id} delay={idx * 150} direction={idx % 2 === 0 ? 'left' : 'right'} className="h-full w-full flex">
               <button
                 onClick={() => setSelected(idx)}
                 className="group w-full flex flex-col text-left relative bg-gradient-to-br from-white/10 to-white/[0.02] backdrop-blur-md border border-white/10 rounded-3xl p-7 sm:p-8 transition-all duration-500 ease-out hover:bg-white/[0.08] hover:border-primary-purple/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-purple/20 overflow-hidden"
