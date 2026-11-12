@@ -84,15 +84,15 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Support By
             </h3>
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+            {/* Menggunakan items-start agar sejajar dari atas */}
+            <div className="flex flex-wrap items-start justify-center gap-6 sm:gap-8">
               {supportBy.map((partner) => (
                 <button
                   key={partner.id}
                   onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center gap-3 w-36 sm:w-40 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  {/* Kotak besar, padding pas, gambar tidak dipaksa melebar */}
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300 flex-shrink-0">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
@@ -103,7 +103,7 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[160px] text-center leading-tight line-clamp-2">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 w-full text-center leading-tight line-clamp-2">
                     {partner.nama}
                   </p>
                 </button>
@@ -116,26 +116,26 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
             <h3 className="text-xl font-bold text-dark-purple dark:text-dark-text mb-6 transition-colors duration-300">
               Sponsor By
             </h3>
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+            {/* Menggunakan items-start agar sejajar dari atas */}
+            <div className="flex flex-wrap items-start justify-center gap-6 sm:gap-8">
               {sponsorBy.map((partner) => (
                 <button
                   key={partner.id}
                   onClick={() => setSelectedPartner(partner)}
-                  className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                  className="group flex flex-col items-center gap-3 w-36 sm:w-40 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  {/* Kotak diperbesar & padding dikurangi */}
-                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-2 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300 flex-shrink-0">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
                       }}
                     />
                   </div>
-                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[160px] text-center leading-tight line-clamp-2">
+                  <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 w-full text-center leading-tight line-clamp-2">
                     {partner.nama}
                   </p>
                 </button>
