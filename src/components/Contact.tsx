@@ -91,13 +91,16 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  {/* PERUBAHAN: dark:bg-slate-100 biar logo hitam kelihatan */}
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                  {/* Kotak diperbesar & padding dikurangi */}
+                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-2 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                       loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
+                      }}
                     />
                   </div>
                   <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
@@ -120,13 +123,16 @@ export default function Contact({ contacts, supportBy, sponsorBy }: ContactProps
                   onClick={() => setSelectedPartner(partner)}
                   className="group flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
-                  {/* PERUBAHAN: dark:bg-slate-100 biar logo hitam kelihatan */}
-                  <div className="w-32 h-32 sm:w-36 sm:h-36 bg-white dark:bg-slate-100 rounded-2xl p-4 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
+                  {/* Kotak diperbesar & padding dikurangi */}
+                  <div className="w-36 h-36 sm:w-40 sm:h-40 bg-white dark:bg-slate-100 rounded-2xl p-2 flex items-center justify-center border border-bubble-light dark:border-slate-300 shadow-sm group-hover:shadow-xl group-hover:border-primary-purple/40 transition-all duration-300">
                     <img
                       src={partner.logo_url}
                       alt={partner.nama}
-                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                       loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://placehold.co/300x300/7b5ea7/ffffff?text=${encodeURIComponent(partner.nama)}`;
+                      }}
                     />
                   </div>
                   <p className="text-sm font-semibold text-dark-purple/70 dark:text-dark-text-muted group-hover:text-primary-purple transition-colors duration-300 max-w-[140px] truncate">
